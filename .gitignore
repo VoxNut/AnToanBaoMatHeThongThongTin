@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+# Build output
+dist/
+build/
+# Env files (IMPORTANT)
+.env
+.env.*
+!.env.example
+# Logs
+*.log
+# Cache
+.vite/
+.cache/
+# Firebase
+.firebase/
+firebase-debug.log
+# OS
+.DS_Store
+Thumbs.db
+# Editor (generic, including Antigravity-safe)
+*.swp
+*.swo
+*~
+target/
+src/main/resources/serviceAccountKey.json
+
