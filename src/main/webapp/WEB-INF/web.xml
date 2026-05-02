@@ -108,7 +108,15 @@
 
     <!-- ========== CUSTOMER SERVLETS ========== -->
 
-
+    <!-- Key Management (Digital Signature) -->
+    <servlet>
+        <servlet-name>KeyManagementServlet</servlet-name>
+        <servlet-class>com.beveragestore.servlet.KeyManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>KeyManagementServlet</servlet-name>
+        <url-pattern>/customer/keys</url-pattern>
+    </servlet-mapping>
 
     <!-- Shopping Cart -->
     <servlet>
