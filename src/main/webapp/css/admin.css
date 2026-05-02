@@ -1,0 +1,240 @@
+/* ==========================================================================
+   Admin Portal Styles
+   ========================================================================== */
+
+.admin-container {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: var(--spacing-xl);
+    min-height: calc(100vh - 200px);
+    margin-bottom: var(--spacing-xxl);
+}
+
+.admin-sidebar {
+    background: var(--bg-white);
+    border-right: 1px solid var(--border-color);
+    padding: var(--spacing-lg) 0;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    align-self: start;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-nav a {
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.admin-nav a:hover, .admin-nav a.active {
+    color: var(--accent-primary);
+    background: var(--bg-secondary);
+    border-left-color: var(--accent-primary);
+}
+
+.admin-content {
+    padding: var(--spacing-lg) 0;
+}
+
+/* Dashboard Specific */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+    background: var(--bg-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    text-align: center;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-value {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    color: var(--text-primary);
+}
+
+.stat-card.revenue .stat-value {
+    color: var(--success-text);
+}
+
+.stat-card.warning .stat-value {
+    color: var(--error-text);
+}
+
+.quick-actions {
+    background: var(--bg-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.quick-actions h3 {
+    font-family: var(--font-body);
+    margin-bottom: var(--spacing-lg);
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+}
+
+/* Tables */
+.table-container {
+    background: var(--bg-white);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg-secondary);
+}
+
+td {
+    font-size: 14px;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-admin { background: #e3f2fd; color: #1976d2; }
+.role-customer { background: #f5f5f5; color: #616161; }
+.role-shipper { background: #fff3e0; color: #f57c00; }
+.role-shop_owner { background: #e8f5e9; color: #388e3c; }
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-active, .status-DELIVERED { background: #e8f5e9; color: #388e3c; }
+.status-inactive, .status-CANCELLED { background: #ffebee; color: #d32f2f; }
+.status-PENDING { background: #fff3e0; color: #f57c00; }
+.status-PROCESSING { background: #e3f2fd; color: #1976d2; }
+.status-SHIPPED { background: #f3e5f5; color: #8e24aa; }
+
+.action-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+select.form-control {
+    padding: 6px 12px;
+    font-size: 13px;
+    width: auto;
+    display: inline-block;
+}
+
+.product-image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.stock-low { color: var(--error-text); font-weight: 600; }
+
+.action-links a, .action-links button {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 13px;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Forms */
+.form-container {
+    background: var(--bg-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    max-width: 800px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.checkbox-group input {
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
+    .form-row { 
+        grid-template-columns: 1fr; 
+        gap: 0; 
+    }
+}
