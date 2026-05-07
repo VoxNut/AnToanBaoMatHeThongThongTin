@@ -36,19 +36,37 @@ public class Order implements Serializable {
     private Date createdAt;
     private Date updatedAt;
     private String notes;           // Optional notes/instructions
+
+    // Signature verification fields
+    private String signature;
+    private String signedHash;
+    private String publicKeyId;
+    private String signatureStatus; // "VALID", "INVALID", "REVOKED_KEY"
+
     public int getTotalItems() {
+
         if (items == null) return 0;
         return items.stream().mapToInt(OrderItem::getQuantity).sum();
     }
 
-    @lombok.Data @lombok.NoArgsConstructor @lombok.AllArgsConstructor @lombok.Builder
-    public static class OrderItem implements java.io.Serializable {
+    /**
+     * Nested class representing a single item within an order.
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OrderItem implements Serializable {
         private static final long serialVersionUID = 1L;
+
         private String productId;
         private String productName;
         private double unitPrice;
         private int quantity;
         private String imageUrl;
-        public double getSubtotal() { return unitPrice * quantity; }
+
+        public double getSubtotal() {
+            return unitPrice * quantity;
+        }
     }
 }
