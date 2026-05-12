@@ -136,7 +136,8 @@ public class CheckoutServlet extends HttpServlet {
                     throw new IllegalArgumentException("Bạn chưa tạo khóa chữ ký. Vui lòng vào trang Quản lý Khóa để tạo trước.");
                 }
 
-                // Step 1: Verify stock for all items
+                // Step 1: Verify stock for all items (perform all reads first)
+                java.util.Map<String, Product> productMap = new java.util.HashMap<>();
                 for (CartItem item : cartItems) {
                     DocumentSnapshot docSnapshot = transaction.get(db.collection("products").document(item.getProductId())).get();
                     Product product = docSnapshot.toObject(Product.class);
@@ -148,12 +149,12 @@ public class CheckoutServlet extends HttpServlet {
                     if (product.getStock() < item.getQuantity()) {
                         throw new IllegalArgumentException("Insufficient stock for: " + product.getName());
                     }
+                    productMap.put(item.getProductId(), product);
                 }
 
-                // Step 2: Decrement stock for all items
+                // Step 2: Decrement stock for all items (perform all writes after)
                 for (CartItem item : cartItems) {
-                    DocumentSnapshot docSnapshot = transaction.get(db.collection("products").document(item.getProductId())).get();
-                    Product product = docSnapshot.toObject(Product.class);
+                    Product product = productMap.get(item.getProductId());
                     int newStock = product.getStock() - item.getQuantity();
 
                     transaction.update(
