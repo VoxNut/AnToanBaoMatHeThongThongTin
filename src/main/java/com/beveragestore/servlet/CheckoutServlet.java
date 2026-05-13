@@ -235,11 +235,21 @@ public class CheckoutServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/customer/order-confirmation?orderId=" + orderId);
 
 
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof IllegalArgumentException) {
+                logger.warn("Order validation failed: {}", cause.getMessage());
+                request.setAttribute("error", cause.getMessage());
+                doGet(request, response);
+            } else {
+                logger.error("Error processing order in transaction", e);
+                request.setAttribute("error", "Error processing order. Please try again.");
+                request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+            }
         } catch (IllegalArgumentException e) {
             logger.warn("Order validation failed: {}", e.getMessage());
             request.setAttribute("error", e.getMessage());
             doGet(request, response);
-
         } catch (Exception e) {
             logger.error("Error processing order", e);
             request.setAttribute("error", "Error processing order. Please try again.");
