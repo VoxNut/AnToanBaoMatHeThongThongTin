@@ -11,8 +11,8 @@ import java.util.List;
 
 
 /**
- * User model representing a customer or admin in the system.
- * This object is stored in the "users" Firestore collection.
+ * model user đại diện cho khách hàng hoặc admin.
+ * đối tượng này được lưu ở collection "users" trên firestore.
  */
 @Data
 @NoArgsConstructor
@@ -21,17 +21,17 @@ import java.util.List;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String uid;              // Firestore document ID
+    private String uid;              // id document trên firestore
     private String fullName;
     private String email;
-    private String passwordHash;    // BCrypt hashed password
-    private String role;            // "customer" or "admin"
-    private String authProvider;    // "local" or "google"
-    private String photoUrl;        // Google profile picture URL
+    private String passwordHash;    // mật khẩu đã được băm bằng bcrypt
+    private String role;            // role của user, chỉ nhận "customer" hoặc "admin" nha
+    private String authProvider;    // phương thức đăng nhập: "local" (tài khoản thường) hoặc "google" (qua bên thứ ba)
+    private String photoUrl;        // url ảnh đại diện lấy từ tài khoản google
     private Date createdAt;
     private boolean active;
 
-    // Cryptographic key management fields
+    // các trường thông tin dùng để quản lý khóa mật mã
     private String activePublicKey;
     private String activePublicKeyId;
     private Date keyRevokedAt;

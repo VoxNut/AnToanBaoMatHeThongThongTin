@@ -37,11 +37,11 @@ public class AdminOrderServlet extends HttpServlet {
                 return;
             }
 
-            // Get all orders
+            // lấy toàn bộ danh sách đơn hàng
             List<Order> orders = orderDAO.getAllOrders();
             UserDAO userDAO = new UserDAO();
 
-            // Verify each order dynamically
+            // xác thực động cho từng đơn hàng
             for (Order order : orders) {
                 if (order.getSignature() == null) {
                     order.setSignatureStatus("UNSIGNED");
@@ -55,7 +55,7 @@ public class AdminOrderServlet extends HttpServlet {
                         continue;
                     }
 
-                    // Find the key in the history that was used to sign the order
+                    // tìm khóa trong lịch sử đã dùng để ký đơn hàng này
                     User.PublicKeyRecord keyRecord = null;
                     if (buyer.getKeyHistory() != null) {
                         for (User.PublicKeyRecord rec : buyer.getKeyHistory()) {
@@ -69,11 +69,11 @@ public class AdminOrderServlet extends HttpServlet {
                     if (keyRecord == null) {
                         order.setSignatureStatus("NO_KEY_FOUND");
                     } else {
-                        // Check if the key was revoked before the order was created
+                        // check xem khóa này có bị hủy trước lúc tạo đơn hàng không nha
                         if (keyRecord.getRevokedAt() != null && keyRecord.getRevokedAt().before(order.getCreatedAt())) {
                             order.setSignatureStatus("REVOKED_KEY");
                         } else {
-                            // Calculate current hash of order to check for tampering
+                            // tính mã băm hiện tại của đơn hàng để kiểm tra xem có bị sửa đổi gì không
                             String currentHash = com.beveragestore.util.CryptoUtil.calculateOrderHash(order);
                             java.security.PublicKey pubKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(keyRecord.getPublicKeyPem());
                             boolean isValid = com.beveragestore.util.CryptoUtil.verify(currentHash, order.getSignature(), pubKey);
@@ -81,7 +81,7 @@ public class AdminOrderServlet extends HttpServlet {
                             if (isValid) {
                                 order.setSignatureStatus("VALID");
                             } else {
-                                order.setSignatureStatus("INVALID"); // Tampered!
+                                order.setSignatureStatus("INVALID"); // đơn hàng đã bị thay đổi trái phép (tampered)!
                             }
                         }
                     }

@@ -15,8 +15,8 @@ import com.beveragestore.dao.ProductDAO;
 import com.beveragestore.model.Product;
 
 /**
- * Servlet for viewing product details (public page).
- * GET param: id (product ID)
+ * servlet xem chi tiết sản phẩm (trang công khai).
+ * tham số get: id (id của sản phẩm)
  */
 public class ProductDetailServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ProductDetailServlet.class);

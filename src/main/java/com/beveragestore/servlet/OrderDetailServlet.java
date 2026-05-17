@@ -16,8 +16,8 @@ import com.beveragestore.model.Order;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Servlet for viewing order details.
- * Shows full details of a specific order.
+ * servlet xem chi tiết đơn hàng.
+ * hiển thị thông tin đầy đủ của một đơn hàng cụ thể.
  */
 public class OrderDetailServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(OrderDetailServlet.class);

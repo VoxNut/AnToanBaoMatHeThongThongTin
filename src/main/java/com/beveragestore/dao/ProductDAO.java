@@ -16,8 +16,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 
 /**
- * DAO for Product entity.
- * Handles all database operations for products in Firestore.
+ * dao cho thực thể sản phẩm (product).
+ * xử lý mọi thao tác dữ liệu liên quan đến sản phẩm trên firestore.
  */
 public class ProductDAO {
     private static final Logger logger = LoggerFactory.getLogger(ProductDAO.class);
@@ -29,7 +29,7 @@ public class ProductDAO {
     }
 
     /**
-     * Create a new product
+     * tạo sản phẩm mới
      */
     public Product createProduct(String name, String category, String brand, String description,
                                  double price, int stock, String imageUrl) throws ExecutionException, InterruptedException {
@@ -58,7 +58,7 @@ public class ProductDAO {
     }
 
     /**
-     * Create a new product from a fully constructed Product object (used by DatabaseSeeder)
+     * tạo sản phẩm mới từ object product đầy đủ (dùng trong databaseseeder)
      */
     public void createProduct(Product product) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)
@@ -69,7 +69,7 @@ public class ProductDAO {
     }
 
     /**
-     * Get product by ID
+     * lấy thông tin sản phẩm theo id
      */
     public Product getProductById(String productId) throws ExecutionException, InterruptedException {
         DocumentSnapshot doc = db.collection(COLLECTION_NAME)
@@ -85,7 +85,7 @@ public class ProductDAO {
     }
 
     /**
-     * Get all active products
+     * lấy toàn bộ sản phẩm đang mở bán
      */
     public List<Product> getAllActiveProducts() throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -103,7 +103,7 @@ public class ProductDAO {
     }
 
     /**
-     * Get all products (including inactive ones - admin only)
+     * lấy tất cả sản phẩm (gồm cả sản phẩm ẩn - chỉ admin được xem)
      */
     public List<Product> getAllProducts() throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -120,7 +120,7 @@ public class ProductDAO {
     }
 
     /**
-     * Get products by category
+     * lấy danh sách sản phẩm theo danh mục
      */
     public List<Product> getProductsByCategory(String category) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -139,7 +139,7 @@ public class ProductDAO {
     }
 
     /**
-     * Search products by name (substring match)
+     * tìm kiếm sản phẩm theo tên (so khớp chuỗi con)
      */
     public List<Product> searchByName(String searchTerm) throws ExecutionException, InterruptedException {
         List<Product> allProducts = getAllActiveProducts();
@@ -156,7 +156,7 @@ public class ProductDAO {
     }
 
     /**
-     * Get low-stock products (stock < 10)
+     * lấy các sản phẩm sắp hết hàng (số lượng tồn < 10)
      */
     public List<Product> getLowStockProducts() throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -174,7 +174,7 @@ public class ProductDAO {
     }
 
     /**
-     * Update product information
+     * cập nhật thông tin chi tiết của sản phẩm
      */
     public void updateProduct(Product product) throws ExecutionException, InterruptedException {
         product.setUpdatedAt(new Date());
@@ -187,7 +187,7 @@ public class ProductDAO {
     }
 
     /**
-     * Soft delete product by setting isActive to false
+     * xóa mềm sản phẩm bằng cách set isactive thành false
      */
     public void deactivateProduct(String productId) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)
@@ -199,7 +199,7 @@ public class ProductDAO {
     }
 
     /**
-     * Update product stock
+     * cập nhật số lượng tồn kho sản phẩm
      */
     public void updateStock(String productId, int newStock) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)
@@ -211,7 +211,7 @@ public class ProductDAO {
     }
 
     /**
-     * Get all categories (unique values from all products)
+     * lấy toàn bộ các danh mục (không trùng nhau từ các sản phẩm)
      */
     public List<String> getAllCategories() throws ExecutionException, InterruptedException {
         List<Product> products = getAllActiveProducts();

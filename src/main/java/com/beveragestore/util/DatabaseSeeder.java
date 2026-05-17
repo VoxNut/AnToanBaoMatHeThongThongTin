@@ -25,7 +25,7 @@ public class DatabaseSeeder {
         logger.info("Starting Database Seeder...");
 
         try {
-            // Force initialization of Firebase
+            // bắt buộc khởi tạo firebase trước
             Firestore db = FirebaseInitializer.getInstance().getFirestore();
             logger.info("Firebase initialized successfully. Seeding data...");
 
@@ -33,21 +33,21 @@ public class DatabaseSeeder {
             ProductDAO productDAO = new ProductDAO();
             OrderDAO orderDAO = new OrderDAO();
 
-            // 1. Seed Users
+            // 1. nạp dữ liệu mẫu cho user
             logger.info("Seeding Users...");
             List<User> users = seedUsers(userDAO);
 
-            // 2. Seed Products
+            // 2. nạp dữ liệu mẫu cho product
             logger.info("Seeding Products...");
             List<Product> products = seedProducts(productDAO);
 
-            // 3. Seed Orders
+            // 3. nạp dữ liệu mẫu cho order
             logger.info("Seeding Orders...");
             seedOrders(orderDAO, users, products);
 
             logger.info("Database Seeder finished successfully!");
 
-            // Allow background threads to finish sending
+            // để cho các luồng chạy ngầm gửi xong dữ liệu đã nha
             Thread.sleep(3000);
             System.exit(0);
             
@@ -60,7 +60,7 @@ public class DatabaseSeeder {
     private static List<User> seedUsers(UserDAO userDAO) throws Exception {
         List<User> seededUsers = new ArrayList<>();
 
-        // Create default users for each role
+        // tạo mấy user mặc định tương ứng với từng role
         User admin = User.builder()
                 .uid(UUID.randomUUID().toString())
                 .fullName("System Admin")
@@ -119,7 +119,7 @@ public class DatabaseSeeder {
         List<User> usersToCreate = Arrays.asList(admin, shopOwner, shipper, customer1, customer2);
         
         for (User u : usersToCreate) {
-            // Check if exists
+            // check xem có tồn tại không
             User existing = userDAO.findByEmail(u.getEmail());
             if (existing == null) {
                 userDAO.createUser(u);
@@ -237,7 +237,7 @@ public class DatabaseSeeder {
 
         List<Product> seededProducts = new ArrayList<>();
         
-        // Let's just retrieve existing products to not duplicate endlessly, or just add them if it's empty
+        // chỉ lấy các sản phẩm hiện tại để không bị trùng lặp, hoặc thêm mới nếu cơ sở dữ liệu đang trống
         List<Product> existingProducts = productDAO.getAllProducts();
         if (existingProducts.isEmpty()) {
             for (Product p : productsToCreate) {
@@ -260,13 +260,13 @@ public class DatabaseSeeder {
             return;
         }
 
-        // Find customer users
+        // tìm các user có role là khách hàng (customer)
         User customer1 = users.stream().filter(u -> u.getEmail().equals("alice@customer.com")).findFirst().orElse(users.get(0));
         User customer2 = users.stream().filter(u -> u.getEmail().equals("bob@customer.com")).findFirst().orElse(users.get(0));
 
-        if (products.size() < 2) return; // safety
+        if (products.size() < 2) return; // đảm bảo an toàn tránh crash
 
-        // Order 1: Alice, PENDING
+        // đơn hàng 1: của alice, trạng thái đang chờ (pending)
         List<Order.OrderItem> items1 = new ArrayList<>();
         items1.add(Order.OrderItem.builder()
                 .productId(products.get(0).getProductId())
@@ -297,7 +297,7 @@ public class DatabaseSeeder {
         orderDAO.createOrder(order1);
         logger.info("Created Order 1 (PENDING) for {}", customer1.getEmail());
 
-        // Order 2: Bob, PROCESSING
+        // đơn hàng 2: của bob, trạng thái đang xử lý (processing)
         List<Order.OrderItem> items2 = new ArrayList<>();
         items2.add(Order.OrderItem.builder()
                 .productId(products.get(5).getProductId())
@@ -321,7 +321,7 @@ public class DatabaseSeeder {
         orderDAO.createOrder(order2);
         logger.info("Created Order 2 (PROCESSING) for {}", customer2.getEmail());
 
-        // Order 3: Alice, DELIVERED
+        // đơn hàng 3: của alice, trạng thái đã giao (delivered)
         List<Order.OrderItem> items3 = new ArrayList<>();
         items3.add(Order.OrderItem.builder()
                 .productId(products.get(1).getProductId())

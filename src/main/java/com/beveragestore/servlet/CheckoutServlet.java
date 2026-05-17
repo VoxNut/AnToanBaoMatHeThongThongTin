@@ -29,14 +29,14 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 
 /**
- * Servlet for checkout and order placement.
- * Uses Firestore Transactions to atomically:
- * 1. Decrement product stock
- * 2. Create order
- * 3. Clear cart
+ * servlet xử lý thanh toán và đặt đơn hàng.
+ * dùng firestore transaction để chạy đồng thời các bước:
+ * 1. trừ số lượng sản phẩm trong kho
+ * 2. tạo đơn hàng mới
+ * 3. xóa sạch giỏ hàng
  * 
- * GET: Show checkout form
- * POST: Process order with transaction
+ * GET: hiển thị form thanh toán
+ * POST: xử lý đặt hàng bằng transaction
  */
 public class CheckoutServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(CheckoutServlet.class);
@@ -64,7 +64,7 @@ public class CheckoutServlet extends HttpServlet {
                 return;
             }
 
-            // Get cart
+            // lấy thông tin giỏ hàng
             List<CartItem> cartItems = cartDAO.getCartItems(userId);
             double cartTotal = cartDAO.getCartTotal(userId);
 
@@ -111,7 +111,7 @@ public class CheckoutServlet extends HttpServlet {
                 return;
             }
 
-            // Get cart items
+            // lấy các món trong giỏ hàng
             List<CartItem> cartItems = cartDAO.getCartItems(userId);
 
             if (cartItems.isEmpty()) {
@@ -121,22 +121,22 @@ public class CheckoutServlet extends HttpServlet {
 
             double cartTotal = cartDAO.getCartTotal(userId);
 
-            // Use Firestore Transaction to atomically:
-            // 1. Check stock availability
-            // 2. Decrement stock for each product
-            // 3. Create signed order
-            // 4. Clear cart
+            // sử dụng firestore transaction để thực hiện các thao tác nguyên tử (atomic):
+            // bước 1: kiểm tra xem trong kho có đủ hàng không
+            // bước 2: giảm số lượng trong kho của mỗi sản phẩm
+            // bước 3: tạo đơn hàng mới có chữ ký số xác thực
+            // bước 4: xóa sạch giỏ hàng của user
             String orderId = UUID.randomUUID().toString();
 
             db.runTransaction(transaction -> {
-                // Step 0: Get User Key Info
+                // bước 0: lấy thông tin khóa của user
                 DocumentSnapshot userSnapshot = transaction.get(db.collection("users").document(userId)).get();
                 User dbUser = userSnapshot.toObject(User.class);
                 if (dbUser == null || dbUser.getActivePublicKey() == null) {
                     throw new IllegalArgumentException("Bạn chưa tạo khóa chữ ký. Vui lòng vào trang Quản lý Khóa để tạo trước.");
                 }
 
-                // Step 1: Verify stock for all items (perform all reads first)
+                // bước 1: check hàng tồn kho cho tất cả các món (phải chạy hết các lệnh đọc trước nha)
                 java.util.Map<String, Product> productMap = new java.util.HashMap<>();
                 for (CartItem item : cartItems) {
                     DocumentSnapshot docSnapshot = transaction.get(db.collection("products").document(item.getProductId())).get();
@@ -152,7 +152,7 @@ public class CheckoutServlet extends HttpServlet {
                     productMap.put(item.getProductId(), product);
                 }
 
-                // Step 2: Decrement stock for all items (perform all writes after)
+                // bước 2: trừ số lượng tồn kho của các món (chạy các lệnh ghi dữ liệu sau)
                 for (CartItem item : cartItems) {
                     Product product = productMap.get(item.getProductId());
                     int newStock = product.getStock() - item.getQuantity();
@@ -164,7 +164,7 @@ public class CheckoutServlet extends HttpServlet {
                     );
                 }
 
-                // Step 3: Create order with order items
+                // bước 3: tạo đơn hàng mới cùng chi tiết sản phẩm
                 List<Order.OrderItem> orderItems = new ArrayList<>();
                 for (CartItem item : cartItems) {
                     orderItems.add(Order.OrderItem.builder()
@@ -188,13 +188,13 @@ public class CheckoutServlet extends HttpServlet {
                         .updatedAt(new Date())
                         .build();
 
-                // Cryptographic Hashing and Signing
+                // băm dữ liệu mật mã và tạo chữ ký số
                 try {
                     String hash = com.beveragestore.util.CryptoUtil.calculateOrderHash(order);
                     java.security.PrivateKey privateKey = com.beveragestore.util.CryptoUtil.pemToPrivateKey(privateKeyPem);
                     String signature = com.beveragestore.util.CryptoUtil.sign(hash, privateKey);
 
-                    // Verify against active public key
+                    // xác thực dựa trên public key đang kích hoạt
                     java.security.PublicKey publicKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(dbUser.getActivePublicKey());
                     boolean isValid = com.beveragestore.util.CryptoUtil.verify(hash, signature, publicKey);
                     if (!isValid) {
@@ -215,7 +215,7 @@ public class CheckoutServlet extends HttpServlet {
 
                 transaction.set(db.collection("orders").document(orderId), order);
 
-                // Step 4: Clear cart items
+                // bước 4: xóa sạch các món trong giỏ hàng
                 for (CartItem item : cartItems) {
                     transaction.delete(
                             db.collection("cart")
@@ -227,11 +227,11 @@ public class CheckoutServlet extends HttpServlet {
 
                 return null;
 
-            }).get(); // Wait for transaction to complete
+            }).get(); // chờ cho transaction thực hiện xong
 
             logger.info("Order placed successfully: {} (userId={}, total={})", orderId, userId, cartTotal);
 
-            // Redirect to order confirmation
+            // chuyển hướng sang trang xác nhận đơn hàng
             response.sendRedirect(request.getContextPath() + "/customer/order-confirmation?orderId=" + orderId);
 
 

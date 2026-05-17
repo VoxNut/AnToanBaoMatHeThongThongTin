@@ -16,9 +16,9 @@ import com.beveragestore.dao.ProductDAO;
 import com.beveragestore.model.Product;
 
 /**
- * Servlet for browsing products (public page).
- * Supports filtering by category and searching by name.
- * GET params: category (optional), search (optional)
+ * servlet để xem danh sách sản phẩm (trang công khai).
+ * hỗ trợ lọc theo danh mục và tìm kiếm theo tên.
+ * các tham số get: category (tùy chọn), search (tùy chọn)
  */
 public class ProductServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ProductServlet.class);
@@ -40,23 +40,23 @@ public class ProductServlet extends HttpServlet {
             String pageTitle = "All Beverages";
 
             if (search != null && !search.trim().isEmpty()) {
-                // Search by product name
+                // tìm kiếm theo tên sản phẩm
                 products = productDAO.searchByName(search);
                 pageTitle = "Search Results for: " + search;
                 logger.info("Product search: {}", search);
 
             } else if (category != null && !category.trim().isEmpty()) {
-                // Filter by category
+                // lọc sản phẩm theo danh mục
                 products = productDAO.getProductsByCategory(category);
                 pageTitle = category + " Beverages";
                 logger.info("Product filter by category: {}", category);
 
             } else {
-                // Get all active products
+                // lấy toàn bộ sản phẩm đang mở bán
                 products = productDAO.getAllActiveProducts();
             }
 
-            // Get all categories for filter dropdown
+            // lấy tất cả các danh mục để hiển thị vào thanh lọc
             List<String> categories = productDAO.getAllCategories();
 
             request.setAttribute("products", products);

@@ -37,7 +37,7 @@ public class AdminProductServlet extends HttpServlet {
             String action = request.getParameter("action");
 
             if ("create".equals(action)) {
-                // Show create form
+                // hiển thị form tạo mới
                 request.setAttribute("mode", "create");
                 request.getRequestDispatcher("/WEB-INF/views/admin/product-form.jsp").forward(request, response);
                 return;
@@ -54,7 +54,7 @@ public class AdminProductServlet extends HttpServlet {
                 }
             }
 
-            // Default: List all products
+            // mặc định: liệt kê tất cả sản phẩm
             List<Product> products = productDAO.getAllProducts();
             request.setAttribute("products", products);
             request.getRequestDispatcher("/WEB-INF/views/admin/products.jsp").forward(request, response);

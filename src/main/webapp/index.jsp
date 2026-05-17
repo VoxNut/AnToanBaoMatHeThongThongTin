@@ -8,12 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><fmt:message key="app.name" /> - The Grindery</title>
     
-    <!-- Google Fonts -->
+    <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     
-    <!-- Global CSS -->
+    <!-- file css dùng chung cho cả web -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/store.css?v=1.0">
 </head>
@@ -43,7 +43,7 @@
                     com.beveragestore.dao.ProductDAO productDAO = new com.beveragestore.dao.ProductDAO();
                     java.util.List<com.beveragestore.model.Product> products = productDAO.getAllActiveProducts();
                     
-                    // Show at most 3 products as featured
+                    // chỉ hiển thị tối đa 3 sản phẩm nổi bật thôi nha
                     int count = 0;
                     for (com.beveragestore.model.Product p : products) {
                         if (count >= 3) break;

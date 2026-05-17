@@ -17,8 +17,8 @@ import com.beveragestore.model.Order;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Servlet for customer order history.
- * Shows all orders placed by the logged-in customer.
+ * servlet hiển thị lịch sử đơn hàng của khách.
+ * hiển thị toàn bộ đơn hàng của khách đang đăng nhập.
  */
 public class OrderHistoryServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(OrderHistoryServlet.class);

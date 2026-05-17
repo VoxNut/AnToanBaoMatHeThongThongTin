@@ -15,8 +15,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 
 /**
- * DAO for Order entity.
- * Handles all database operations for orders in Firestore.
+ * dao cho thực thể đơn hàng (order).
+ * xử lý mọi thao tác dữ liệu liên quan đến đơn hàng trên firestore.
  */
 public class OrderDAO {
     private static final Logger logger = LoggerFactory.getLogger(OrderDAO.class);
@@ -28,7 +28,7 @@ public class OrderDAO {
     }
 
     /**
-     * Create a new order
+     * tạo đơn hàng mới
      */
     public void createOrder(Order order) throws ExecutionException, InterruptedException {
         order.setCreatedAt(new Date());
@@ -43,7 +43,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get order by ID
+     * lấy thông tin đơn hàng theo id
      */
     public Order getOrderById(String orderId) throws ExecutionException, InterruptedException {
         DocumentSnapshot doc = db.collection(COLLECTION_NAME)
@@ -59,7 +59,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get all orders for a specific user
+     * lấy toàn bộ đơn hàng của một user cụ thể
      */
     public List<Order> getOrdersByUserId(String userId) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -77,7 +77,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get all orders (admin view)
+     * lấy toàn bộ đơn hàng (giao diện của admin)
      */
     public List<Order> getAllOrders() throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -94,7 +94,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get orders filtered by status
+     * lọc danh sách đơn hàng theo trạng thái
      */
     public List<Order> getOrdersByStatus(String status) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -112,7 +112,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get orders by user and status
+     * lấy các đơn hàng theo user và trạng thái
      */
     public List<Order> getOrdersByUserIdAndStatus(String userId, String status) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -131,7 +131,7 @@ public class OrderDAO {
     }
 
     /**
-     * Update order status
+     * cập nhật trạng thái đơn hàng
      */
     public void updateOrderStatus(String orderId, String newStatus) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)
@@ -143,7 +143,7 @@ public class OrderDAO {
     }
 
     /**
-     * Update entire order
+     * cập nhật toàn bộ thông tin đơn hàng
      */
     public void updateOrder(Order order) throws ExecutionException, InterruptedException {
         order.setUpdatedAt(new Date());
@@ -157,7 +157,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get total orders count
+     * lấy tổng số lượng đơn hàng
      */
     public long getTotalOrdersCount() throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME).get().get();
@@ -165,7 +165,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get total revenue
+     * tính tổng doanh thu
      */
     public double getTotalRevenue() throws ExecutionException, InterruptedException {
         List<Order> orders = getAllOrders();
@@ -181,7 +181,7 @@ public class OrderDAO {
     }
 
     /**
-     * Get orders created today
+     * lấy danh sách đơn hàng được tạo hôm nay
      */
     public List<Order> getOrdersCreatedToday() throws ExecutionException, InterruptedException {
         Date today = new Date();

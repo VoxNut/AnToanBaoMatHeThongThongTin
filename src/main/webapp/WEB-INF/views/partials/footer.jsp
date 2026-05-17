@@ -9,7 +9,7 @@
     </div>
 </footer>
 
-<!-- Global Scripts -->
+<!-- file js script dùng chung cho cả web -->
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
 </body>
 </html>

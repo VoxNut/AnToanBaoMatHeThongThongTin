@@ -19,9 +19,9 @@ import com.beveragestore.model.Product;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Servlet for shopping cart operations (customer only).
- * Handles multiple actions: add, update, remove, view
- * Action parameter determines the operation.
+ * servlet xử lý các thao tác với giỏ hàng (chỉ khách hàng mới được dùng).
+ * xử lý nhiều hành động: thêm, sửa số lượng, xóa, xem.
+ * tham số action sẽ quyết định hành động nào được chạy.
  */
 public class CartServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(CartServlet.class);
@@ -45,7 +45,7 @@ public class CartServlet extends HttpServlet {
                 return;
             }
 
-            // Get cart items
+            // lấy các món trong giỏ hàng
             List<CartItem> cartItems = cartDAO.getCartItems(userId);
             double cartTotal = cartDAO.getCartTotal(userId);
 
@@ -110,7 +110,7 @@ public class CartServlet extends HttpServlet {
                 quantity = 1;
             }
 
-            // Get product details
+            // lấy chi tiết sản phẩm
             Product product = productDAO.getProductById(productId);
 
             if (product == null || !product.isActive()) {
@@ -119,25 +119,25 @@ public class CartServlet extends HttpServlet {
                 return;
             }
 
-            // Check stock
+            // kiểm tra hàng trong kho
             if (product.getStock() < quantity) {
                 logger.warn("Insufficient stock for product: {}", productId);
                 response.sendRedirect(request.getContextPath() + "/product?id=" + productId + "&error=insufficient_stock");
                 return;
             }
 
-            // Get existing cart item or create new one
+            // lấy cart item hiện có hoặc tạo mới nếu chưa có
             CartItem existingItem = cartDAO.getCartItem(userId, productId);
 
             if (existingItem != null) {
-                // Update quantity
+                // cập nhật số lượng
                 int newQuantity = existingItem.getQuantity() + quantity;
                 if (newQuantity > product.getStock()) {
                     newQuantity = product.getStock();
                 }
                 cartDAO.updateCartItemQuantity(userId, productId, newQuantity);
             } else {
-                // Add new item
+                // thêm món mới vào giỏ hàng
                 CartItem cartItem = CartItem.builder()
                         .productId(productId)
                         .name(product.getName())

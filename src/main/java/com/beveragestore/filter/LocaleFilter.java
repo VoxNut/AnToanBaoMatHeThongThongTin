@@ -21,7 +21,7 @@ public class LocaleFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpSession session = httpRequest.getSession();
 
-        // Get lang from session, default to "en"
+        // lấy ngôn ngữ từ session, mặc định là tiếng anh "en"
         String lang = (String) session.getAttribute("lang");
         if (lang == null || lang.isEmpty()) {
             lang = "en";
@@ -29,7 +29,7 @@ public class LocaleFilter implements Filter {
 
         Locale locale = new Locale(lang);
 
-        // Set locale on BOTH session and request scope for maximum reliability
+        // thiết lập locale trên cả session và request scope để đảm bảo chuẩn xác nhất
         Config.set(session, Config.FMT_LOCALE, locale);
         Config.set(request, Config.FMT_LOCALE, locale);
 

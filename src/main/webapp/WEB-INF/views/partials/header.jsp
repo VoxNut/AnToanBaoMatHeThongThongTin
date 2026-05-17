@@ -75,7 +75,7 @@
     </div>
 </header>
 
-    <!-- Hidden elements to pass server messages to JS -->
+    <!-- mấy thẻ ẩn này dùng để gửi thông báo từ servlet qua js nha -->
 <% if (request.getAttribute("error") != null) { %>
     <div id="server-error-msg" style="display:none;"><%= request.getAttribute("error") %></div>
 <% } %>
@@ -88,7 +88,7 @@ function toggleDropdown() {
     document.getElementById("userDropdown").classList.toggle("show");
 }
 
-// Close the dropdown if the user clicks outside of it
+// đóng cái dropdown nếu user click ra ngoài nha
 window.onclick = function(event) {
     if (!event.target.matches('.user-avatar') && !event.target.matches('.default-avatar') && !event.target.closest('.avatar-container')) {
         var dropdowns = document.getElementsByClassName("dropdown-menu");

@@ -19,12 +19,11 @@ import com.beveragestore.model.User;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Authentication Filter that protects /customer/* and /admin/* URL patterns.
- * 
- * - Checks if user is logged in
- * - Redirects unauthenticated users to login page
- * - Validates role-based access (admins can't access customer pages and vice versa)
- * - Returns 403 Forbidden for unauthorized access
+ * bộ lọc xác thực bảo vệ các link dạng /customer/* và /admin/*.
+ * - check xem user đã đăng nhập chưa
+ * - chưa đăng nhập thì đẩy về trang login nha
+ * - check quyền theo role (admin không được vào trang customer và ngược lại)
+ * - trả về lỗi 403 forbidden nếu truy cập trái phép
  */
 public class AuthFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
@@ -48,33 +47,33 @@ public class AuthFilter implements Filter {
 
         logger.debug("Auth filter processing: {}", path);
 
-        // Check if user is logged in
+        // check xem người dùng đã đăng nhập chưa
         User loggedInUser = SessionUtil.getUserFromSession(session);
 
         if (loggedInUser == null) {
-            // User not logged in - redirect to login
+            // user chưa đăng nhập -> chuyển hướng về trang login nha
             logger.warn("Unauthenticated request to protected resource: {}", path);
             httpResponse.sendRedirect(contextPath + "/login");
             return;
         }
 
-        // User is logged in - check role-based access
+        // user đã đăng nhập -> check tiếp quyền hạn truy cập
         if (path.startsWith("/admin/")) {
-            // Admin-only area
+            // khu vực này chỉ dành riêng cho admin thôi nha
             if (!loggedInUser.isAdmin()) {
                 logger.warn("Non-admin user attempted to access admin area: {} (user: {})", path, loggedInUser.getEmail());
-                // Return 403 Forbidden
+                // trả về lỗi 403 forbidden
                 httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 httpRequest.getRequestDispatcher("/WEB-INF/views/403.jsp").forward(request, response);
                 return;
             }
         } else if (path.startsWith("/customer/")) {
-            // Customer area
-            // Accessible by all authenticated users (including Admins, Shippers, Shop Owners) so they can make purchases
-            // We already verified the user is authenticated above, so no further role check is needed here.
+            // khu vực dành riêng cho khách hàng
+            // chỗ này các user đã đăng nhập (gồm cả admin, shipper, chủ shop) đều vào mua hàng được nha
+            // ở trên đã kiểm tra user đăng nhập rồi nên ở đây không cần check role nữa
         }
 
-        // User is authenticated and authorized - proceed
+        // user đã xác thực và có quyền truy cập -> cho đi tiếp nha
         logger.debug("Auth filter passed for user: {} at path: {}", loggedInUser.getEmail(), path);
         chain.doFilter(request, response);
     }

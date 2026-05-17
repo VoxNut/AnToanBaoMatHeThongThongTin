@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Servlet for user logout.
- * Invalidates the session and redirects to homepage.
+ * servlet đăng xuất.
+ * hủy session hiện tại rồi quay về trang chủ.
  */
 public class LogoutServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(LogoutServlet.class);
@@ -32,7 +32,7 @@ public class LogoutServlet extends HttpServlet {
             logger.info("User logged out: {}", email);
         }
 
-        // Redirect to homepage with logout message
+        // chuyển hướng về trang chủ kèm theo thông báo đăng xuất
         response.sendRedirect(request.getContextPath() + "/?msg=logout");
     }
 

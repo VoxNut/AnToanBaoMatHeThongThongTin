@@ -11,12 +11,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><fmt:message key="checkout.title" /> - The Grindery</title>
     
-    <!-- Google Fonts -->
+    <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     
-    <!-- Global CSS -->
+    <!-- file css dùng chung cho cả web -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/store.css?v=1.0">
 </head>
@@ -37,7 +37,7 @@
     <% } %>
 
     <div class="checkout-layout">
-        <!-- Form Section -->
+        <!-- phần form nhập liệu -->
         <div class="checkout-form-container">
             <h2><fmt:message key="checkout.shipping_delivery" /></h2>
 
@@ -67,7 +67,7 @@
             <a href="${pageContext.request.contextPath}/customer/cart" class="back-link"><fmt:message key="checkout.return_to_cart" /></a>
         </div>
 
-        <!-- Summary Section -->
+        <!-- phần tóm tắt nha -->
         <div class="checkout-summary">
             <h3><fmt:message key="cart.order_summary" /></h3>
 

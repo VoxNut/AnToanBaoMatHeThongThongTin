@@ -42,7 +42,7 @@ public class KeyManagementServlet extends HttpServlet {
                 return;
             }
 
-            // Reload user from DB to get the latest key info
+            // tải lại thông tin user từ db để cập nhật thông tin khóa mới nhất
             user = userDAO.findByUid(user.getUid());
             request.setAttribute("userKeys", user);
 
@@ -64,7 +64,7 @@ public class KeyManagementServlet extends HttpServlet {
             }
 
 
-            // Reload user from DB
+            // tải lại thông tin user từ cơ sở dữ liệu
             user = userDAO.findByUid(user.getUid());
 
             String action = request.getParameter("action");
@@ -83,13 +83,13 @@ public class KeyManagementServlet extends HttpServlet {
     }
 
     private void handleGenerateKeys(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
-        // Generate key pair
+        // tạo cặp khóa mới
         KeyPair keyPair = CryptoUtil.generateKeyPair();
         String pubKeyPem = CryptoUtil.publicKeyToPem(keyPair.getPublic());
         String privKeyPem = CryptoUtil.privateKeyToPem(keyPair.getPrivate());
         String keyId = UUID.randomUUID().toString();
 
-        // Save public key details to user
+        // lưu thông tin public key vào thông tin user
         user.setActivePublicKey(pubKeyPem);
         user.setActivePublicKeyId(keyId);
         user.setKeyRevokedAt(null);
@@ -108,17 +108,17 @@ public class KeyManagementServlet extends HttpServlet {
         userDAO.updateUser(user);
         logger.info("Generated new key pair for user: {}, KeyID: {}", user.getEmail(), keyId);
 
-        // Download private key
+        // tải xuống private key
         sendPrivateKeyDownload(response, user.getEmail(), keyId, privKeyPem);
     }
 
     private void handleRevokeKeys(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
-        String inputRevokeTimeStr = request.getParameter("revokeTime"); // User can input custom time of leak
-        Date revokeDate = new Date(); // Default to now
+        String inputRevokeTimeStr = request.getParameter("revokeTime"); // user có thể nhập thời điểm rò rỉ khóa tùy chọn
+        Date revokeDate = new Date(); // mặc định lấy thời gian hiện tại
         if (inputRevokeTimeStr != null && !inputRevokeTimeStr.trim().isEmpty()) {
             try {
-                // simple ISO parsing or datetime-local parsing
-                // input from HTML datetime-local is yyyy-MM-dd'T'HH:mm
+                // phân tích định dạng iso hoặc datetime-local đơn giản
+                // dữ liệu đầu vào từ html datetime-local có dạng yyyy-MM-dd'T'HH:mm
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
                 revokeDate = sdf.parse(inputRevokeTimeStr);
             } catch (Exception e) {
@@ -126,7 +126,7 @@ public class KeyManagementServlet extends HttpServlet {
             }
         }
 
-        // Revoke active key in history
+        // hủy kích hoạt khóa đang sử dụng trong lịch sử khóa
         String activeKeyId = user.getActivePublicKeyId();
         List<User.PublicKeyRecord> history = user.getKeyHistory();
         if (history != null && activeKeyId != null) {
@@ -138,16 +138,16 @@ public class KeyManagementServlet extends HttpServlet {
             }
         }
 
-        // Generate new key pair
+        // tạo cặp khóa mới tinh
         KeyPair keyPair = CryptoUtil.generateKeyPair();
         String pubKeyPem = CryptoUtil.publicKeyToPem(keyPair.getPublic());
         String privKeyPem = CryptoUtil.privateKeyToPem(keyPair.getPrivate());
         String newKeyId = UUID.randomUUID().toString();
 
-        // Update user
+        // cập nhật user
         user.setActivePublicKey(pubKeyPem);
         user.setActivePublicKeyId(newKeyId);
-        user.setKeyRevokedAt(null); // new key is not revoked
+        user.setKeyRevokedAt(null); // khóa mới tạo mặc định chưa bị thu hồi
 
         if (history == null) {
             history = new ArrayList<>();
@@ -162,7 +162,7 @@ public class KeyManagementServlet extends HttpServlet {
         userDAO.updateUser(user);
         logger.info("Revoked key {} and generated new key {} for user {}", activeKeyId, newKeyId, user.getEmail());
 
-        // Download new private key
+        // tải xuống private key mới tạo
         sendPrivateKeyDownload(response, user.getEmail(), newKeyId, privKeyPem);
     }
 

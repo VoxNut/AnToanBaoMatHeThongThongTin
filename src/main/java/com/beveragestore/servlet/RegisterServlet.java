@@ -16,9 +16,9 @@ import com.beveragestore.model.User;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Servlet for user registration.
- * Creates a new user account with hashed password.
- * Validates input and checks for duplicate emails.
+ * servlet đăng ký tài khoản user mới.
+ * tạo tài khoản mới với mật khẩu đã băm.
+ * kiểm tra tính hợp lệ của dữ liệu đầu vào và check trùng email.
  */
 public class RegisterServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(RegisterServlet.class);
@@ -32,14 +32,14 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // If user is already logged in, redirect to home
+        // nếu user đã đăng nhập rồi thì chuyển về trang chủ luôn nha
         User loggedInUser = SessionUtil.getUserFromSession(request.getSession(false));
         if (loggedInUser != null) {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
 
-        // Show registration form
+        // hiển thị form đăng ký
         request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
     }
 
@@ -50,7 +50,7 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        // Validate input
+        // kiểm tra tính hợp lệ của dữ liệu đầu vào (validate)
         if (fullName == null || fullName.trim().isEmpty()) {
             request.setAttribute("error", "Full name is required");
             logger.warn("Registration attempt with missing full name");
@@ -86,17 +86,17 @@ public class RegisterServlet extends HttpServlet {
         }
 
         try {
-            // Register user
+            // đăng ký user mới
             User newUser = userDAO.registerUser(fullName, email, password);
 
             logger.info("New user registered successfully: {} ({})", email, fullName);
 
-            // Set success message and redirect to login
+            // thiết lập thông báo thành công rồi đẩy về trang login
             request.setAttribute("success", "Registration successful! Please log in with your credentials.");
             request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
 
         } catch (IllegalArgumentException e) {
-            // Email already exists
+            // email này đã tồn tại trong hệ thống rồi
             request.setAttribute("error", e.getMessage());
             logger.warn("Registration failed: {}", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);

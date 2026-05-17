@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><fmt:message key="login.title" /> - The Grindery</title>
     
-    <!-- Google Fonts -->
+    <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     
-    <!-- Global CSS -->
+    <!-- file css dùng chung cho cả web -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
 </head>
 <body>
@@ -26,7 +26,7 @@
             <p style="color: var(--text-secondary);"><fmt:message key="login.subtitle" /></p>
         </div>
 
-        <!-- Google Sign-In Button -->
+        <!-- nút đăng nhập bằng tài khoản google -->
         <button type="button" id="googleSignInBtn" class="btn-google" onclick="signInWithGoogle()">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -63,7 +63,7 @@
 
 <jsp:include page="/WEB-INF/views/partials/footer.jsp" />
 
-<!-- Firebase JS SDK -->
+<!-- firebase js sdk -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 

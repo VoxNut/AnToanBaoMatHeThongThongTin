@@ -25,11 +25,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * Servlet for handling Google Sign-In authentication.
- * 
- * Receives a Firebase ID token from the frontend (obtained via Firebase JS SDK),
- * verifies it using Firebase Admin SDK, and creates or finds the user in Firestore.
- * On success, establishes a session and returns a JSON response with the redirect URL.
+ * servlet xử lý đăng nhập bằng google.
+ * nhận firebase id token từ frontend (lấy qua firebase js sdk),
+ * sử dụng firebase admin sdk để check token, sau đó tìm hoặc tạo user mới trên firestore.
+ * nếu thành công thì tạo session đăng nhập và trả về chuỗi json chứa link chuyển hướng.
  */
 public class GoogleAuthServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(GoogleAuthServlet.class);
@@ -48,7 +47,7 @@ public class GoogleAuthServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            // Read the request body (JSON with idToken)
+            // đọc body của request (dạng json chứa idtoken)
             StringBuilder sb = new StringBuilder();
             BufferedReader reader = request.getReader();
             String line;
@@ -67,11 +66,11 @@ public class GoogleAuthServlet extends HttpServlet {
 
             String idToken = jsonRequest.get("idToken").getAsString();
 
-            // Verify the Firebase ID token using Admin SDK
+            // xác thực firebase id token bằng admin sdk
             FirebaseAuth firebaseAuth = FirebaseInitializer.getInstance().getFirebaseAuth();
             FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
 
-            // Extract user info from the verified token
+            // lấy thông tin user từ token đã được xác thực
             String uid = decodedToken.getUid();
             String email = decodedToken.getEmail();
             String name = decodedToken.getName();
@@ -85,7 +84,7 @@ public class GoogleAuthServlet extends HttpServlet {
 
             logger.info("Google Sign-In token verified for: {} (uid: {})", email, uid);
 
-            // Find or create user in Firestore
+            // tìm hoặc tạo user mới trên firestore
             User user = userDAO.findOrCreateGoogleUser(uid, email, name, picture);
 
             if (!user.isActive()) {
@@ -94,13 +93,13 @@ public class GoogleAuthServlet extends HttpServlet {
                 return;
             }
 
-            // Login successful - store user in session
+            // đăng nhập thành công -> lưu thông tin user vào session
             HttpSession session = request.getSession(true);
             SessionUtil.setUserInSession(session, user);
 
             logger.info("Google user logged in successfully: {} (role: {})", user.getEmail(), user.getRole());
 
-            // Build redirect URL based on role
+            // tạo link redirect dựa vào role của user
             String contextPath = request.getContextPath();
             String redirectUrl;
             if (user.isAdmin()) {
@@ -109,7 +108,7 @@ public class GoogleAuthServlet extends HttpServlet {
                 redirectUrl = contextPath + "/";
             }
 
-            // Return success response with redirect URL
+            // trả về phản hồi thành công kèm link chuyển hướng
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.addProperty("success", true);
             jsonResponse.addProperty("redirectUrl", redirectUrl);

@@ -18,7 +18,7 @@ public class LanguageServlet extends HttpServlet {
             session.setAttribute("lang", lang);
         }
 
-        // Redirect back to the referring page
+        // chuyển hướng quay lại trang trước đó
         String referer = request.getHeader("referer");
         if (referer != null && !referer.isEmpty()) {
             response.sendRedirect(referer);

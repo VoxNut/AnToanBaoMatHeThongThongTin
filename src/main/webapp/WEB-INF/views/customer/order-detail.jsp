@@ -6,12 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Details - Online Beverage Store</title>
-    <!-- Google Fonts -->
+    <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     
-    <!-- Global CSS -->
+    <!-- file css dùng chung cho cả web -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/store.css?v=1.0">
 </head>
@@ -47,7 +47,7 @@
 
     <div class="order-detail-layout">
         <div class="main-column">
-            <!-- Status Timeline -->
+            <!-- tiến trình trạng thái đơn hàng -->
             <div class="detail-section">
                 <h2>Order Timeline</h2>
                 <div class="timeline">
@@ -82,7 +82,7 @@
                 </div>
             </div>
 
-            <!-- Order Items -->
+            <!-- các món hàng trong đơn -->
             <div class="detail-section">
                 <h2>Items Ordered</h2>
                 <div class="table-container">
@@ -111,7 +111,7 @@
         </div>
 
         <div class="side-column">
-            <!-- Order Summary -->
+            <!-- tóm tắt đơn hàng -->
             <div class="checkout-summary">
                 <h3>Order Summary</h3>
                 <div class="summary-row">

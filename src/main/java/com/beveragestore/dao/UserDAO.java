@@ -17,8 +17,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 
 /**
- * DAO for User entity.
- * Handles all database operations for users in Firestore.
+ * dao cho thực thể người dùng (user).
+ * xử lý mọi thao tác dữ liệu liên quan đến user trên firestore.
  */
 public class UserDAO {
     private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
@@ -30,23 +30,23 @@ public class UserDAO {
     }
 
     /**
-     * Register a new user
-     * Generates a UUID as the user ID
+     * đăng ký user mới
+     * tự động sinh uuid làm id luôn
      */
     public User registerUser(String fullName, String email, String plainPassword) throws ExecutionException, InterruptedException {
-        // Check if email already exists
+        // check xem email này đã có ai đăng ký chưa nha
         User existingUser = findByEmail(email);
         if (existingUser != null) {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        // Hash password using BCrypt
+        // băm mật khẩu bằng bcrypt
         String passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
 
-        // Generate user ID
+        // tự sinh id cho user
         String uid = UUID.randomUUID().toString();
 
-        // Create user object with local auth provider
+        // tạo đối tượng user mới với phương thức xác thực local
         User user = User.builder()
                 .uid(uid)
                 .fullName(fullName)
@@ -58,7 +58,7 @@ public class UserDAO {
                 .active(true)
                 .build();
 
-        // Save to Firestore
+        // lưu vào firestore
         db.collection(COLLECTION_NAME)
                 .document(uid)
                 .set(user)
@@ -69,7 +69,7 @@ public class UserDAO {
     }
 
     /**
-     * Create a user from a fully constructed User object (used by DatabaseSeeder)
+     * tạo user mới từ object user đầy đủ (dùng trong databaseseeder)
      */
     public void createUser(User user) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)
@@ -80,16 +80,16 @@ public class UserDAO {
     }
 
     /**
-     * Find or create a user from Google Sign-In.
-     * If a user with the same email exists, link the Google account.
-     * If no user exists, create a new one with Google provider.
+     * tìm hoặc tạo user mới từ google sign-in.
+     * nếu đã có user trùng email thì liên kết với tài khoản google luôn.
+     * nếu chưa có thì tạo user mới sử dụng google làm nhà cung cấp.
      */
     public User findOrCreateGoogleUser(String firebaseUid, String email, String fullName, String photoUrl) throws ExecutionException, InterruptedException {
-        // First, check if user already exists by email
+        // đầu tiên là check xem user đã tồn tại qua email chưa nha
         User existingUser = findByEmail(email);
 
         if (existingUser != null) {
-            // User exists - update with Google info if needed
+            // user đã tồn tại -> cập nhật thêm thông tin từ google nếu cần
             if (!"google".equals(existingUser.getAuthProvider())) {
                 existingUser.setAuthProvider("google");
             }
@@ -100,13 +100,13 @@ public class UserDAO {
                 (existingUser.getFullName() == null || existingUser.getFullName().isEmpty())) {
                 existingUser.setFullName(fullName);
             }
-            // Update the user in Firestore
+            // cập nhật thông tin user trên firestore
             updateUser(existingUser);
             logger.info("Existing user linked with Google: {}", email);
             return existingUser;
         }
 
-        // Create new Google user using Firebase UID as document ID
+        // tạo user google mới lấy uid firebase làm id document
         User newUser = User.builder()
                 .uid(firebaseUid)
                 .fullName(fullName)
@@ -118,7 +118,7 @@ public class UserDAO {
                 .active(true)
                 .build();
 
-        // Save to Firestore
+        // lưu vào firestore
         db.collection(COLLECTION_NAME)
                 .document(firebaseUid)
                 .set(newUser)
@@ -129,7 +129,7 @@ public class UserDAO {
     }
 
     /**
-     * Find user by email and verify password
+     * tìm user theo email và check xem mật khẩu có đúng không
      */
     public User findByEmailAndPassword(String email, String plainPassword) throws ExecutionException, InterruptedException {
         User user = findByEmail(email);
@@ -142,7 +142,7 @@ public class UserDAO {
     }
 
     /**
-     * Find user by email
+     * tìm user theo email
      */
     public User findByEmail(String email) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME)
@@ -159,7 +159,7 @@ public class UserDAO {
     }
 
     /**
-     * Find user by UID
+     * tìm user theo uid
      */
     public User findByUid(String uid) throws ExecutionException, InterruptedException {
         DocumentSnapshot doc = db.collection(COLLECTION_NAME)
@@ -175,7 +175,7 @@ public class UserDAO {
     }
 
     /**
-     * Get all users (admin only)
+     * lấy toàn bộ danh sách user (chỉ dành cho admin)
      */
     public List<User> getAllUsers() throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(COLLECTION_NAME).get().get();
@@ -189,7 +189,7 @@ public class UserDAO {
     }
 
     /**
-     * Update user information
+     * cập nhật thông tin của user
      */
     public void updateUser(User user) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)
@@ -201,7 +201,7 @@ public class UserDAO {
     }
 
     /**
-     * Delete user (soft delete by setting active to false)
+     * xóa user (dùng xóa mềm bằng cách set active thành false)
      */
     public void deactivateUser(String uid) throws ExecutionException, InterruptedException {
         db.collection(COLLECTION_NAME)

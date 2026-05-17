@@ -5,35 +5,35 @@ import javax.servlet.http.HttpSession;
 import com.beveragestore.model.User;
 
 /**
- * Utility class for session management.
- * Provides helper methods for working with user sessions.
+ * class tiện ích để quản lý session (phiên làm việc).
+ * cung cấp các hàm helper để xử lý session của user.
  */
 public class SessionUtil {
     private static final String SESSION_KEY_USER = "loggedInUser";
 
     /**
-     * Store user in session after successful login
+     * lưu user vào session sau khi đăng nhập thành công
      */
     public static void setUserInSession(HttpSession session, User user) {
         session.setAttribute(SESSION_KEY_USER, user);
     }
 
     /**
-     * Retrieve logged-in user from session
+     * lấy thông tin user đã đăng nhập từ session
      */
     public static User getUserFromSession(HttpSession session) {
         return (User) session.getAttribute(SESSION_KEY_USER);
     }
 
     /**
-     * Check if user is logged in
+     * check xem người dùng đã đăng nhập chưa
      */
     public static boolean isUserLoggedIn(HttpSession session) {
         return session != null && session.getAttribute(SESSION_KEY_USER) != null;
     }
 
     /**
-     * Check if logged-in user is an admin
+     * check xem user đang đăng nhập có phải admin không
      */
     public static boolean isAdmin(HttpSession session) {
         User user = getUserFromSession(session);
@@ -41,7 +41,7 @@ public class SessionUtil {
     }
 
     /**
-     * Check if logged-in user is a customer
+     * check xem user đang đăng nhập có phải khách hàng (customer) không
      */
     public static boolean isCustomer(HttpSession session) {
         User user = getUserFromSession(session);
@@ -49,7 +49,7 @@ public class SessionUtil {
     }
 
     /**
-     * Check if logged-in user is a shipper
+     * check xem user đang đăng nhập có phải shipper không
      */
     public static boolean isShipper(HttpSession session) {
         User user = getUserFromSession(session);
@@ -57,7 +57,7 @@ public class SessionUtil {
     }
 
     /**
-     * Check if logged-in user is a shop owner
+     * check xem user đang đăng nhập có phải chủ shop không
      */
     public static boolean isShopOwner(HttpSession session) {
         User user = getUserFromSession(session);
@@ -65,7 +65,7 @@ public class SessionUtil {
     }
 
     /**
-     * Get user ID from session
+     * lấy id của user đang lưu trong session
      */
     public static String getUserId(HttpSession session) {
         User user = getUserFromSession(session);
@@ -73,7 +73,7 @@ public class SessionUtil {
     }
 
     /**
-     * Clear user session (logout)
+     * xóa sạch session của user (đăng xuất)
      */
     public static void clearUserSession(HttpSession session) {
         if (session != null) {

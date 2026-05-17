@@ -13,14 +13,12 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * Singleton class to initialize Firebase Admin SDK and provide access to Firestore.
- * 
- * This class ensures that Firebase is initialized only once when the application starts.
- * The serviceAccountKey.json file should be placed in src/main/resources/.
- * 
- * Usage:
- *   Firestore db = FirebaseInitializer.getInstance().getFirestore();
- *   FirebaseAuth auth = FirebaseInitializer.getInstance().getFirebaseAuth();
+ * class singleton để khởi tạo firebase admin sdk và cấp quyền truy cập firestore.
+ * đảm bảo firebase chỉ khởi tạo đúng một lần khi app bắt đầu chạy.
+ * file serviceaccountkey.json cần được đặt trong thư mục src/main/resources/.
+ * cách dùng:
+ * Firestore db = FirebaseInitializer.getInstance().getFirestore();
+ * FirebaseAuth auth = FirebaseInitializer.getInstance().getFirebaseAuth();
  */
 public class FirebaseInitializer {
     private static final Logger logger = LoggerFactory.getLogger(FirebaseInitializer.class);
@@ -28,14 +26,14 @@ public class FirebaseInitializer {
     private Firestore firestore;
 
     /**
-     * Private constructor to prevent instantiation
+     * constructor private để chặn việc khởi tạo đối tượng trực tiếp bên ngoài class
      */
     private FirebaseInitializer() {
         initializeFirebase();
     }
 
     /**
-     * Get singleton instance
+     * lấy instance duy nhất (singleton)
      */
     public static synchronized FirebaseInitializer getInstance() {
         if (instance == null) {
@@ -45,11 +43,11 @@ public class FirebaseInitializer {
     }
 
     /**
-     * Initialize Firebase Admin SDK using serviceAccountKey.json from classpath
+     * khởi tạo firebase admin sdk sử dụng file serviceaccountkey.json từ classpath
      */
     private void initializeFirebase() {
         try {
-            // Load service account key from classpath (src/main/resources/)
+            // nạp file serviceaccountkey.json từ classpath (src/main/resources/)
             InputStream serviceAccount = getClass().getClassLoader()
                     .getResourceAsStream("serviceAccountKey.json");
             
@@ -61,7 +59,7 @@ public class FirebaseInitializer {
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            // Check if Firebase is already initialized (prevent re-initialization)
+            // check xem firebase đã khởi tạo chưa để đỡ bị chạy lại
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
                 logger.info("Firebase initialized successfully");
@@ -69,7 +67,7 @@ public class FirebaseInitializer {
                 logger.info("Firebase is already initialized");
             }
 
-            // Get Firestore instance
+            // lấy instance của firestore
             this.firestore = FirestoreClient.getFirestore();
             logger.info("Firestore client initialized successfully");
 
@@ -80,7 +78,7 @@ public class FirebaseInitializer {
     }
 
     /**
-     * Get Firestore database instance
+     * lấy instance của cơ sở dữ liệu firestore
      */
     public Firestore getFirestore() {
         if (firestore == null) {
@@ -90,7 +88,7 @@ public class FirebaseInitializer {
     }
 
     /**
-     * Get FirebaseAuth instance for token verification
+     * lấy instance của firebaseauth để check token
      */
     public FirebaseAuth getFirebaseAuth() {
         return FirebaseAuth.getInstance();

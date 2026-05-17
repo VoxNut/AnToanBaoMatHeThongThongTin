@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * CartItem model representing a product in the user's cart.
- * Stored in the "cart" subcollection under each user's document.
- * Accessed via: db.collection("cart").document(userId).collection("items").document(productId)
+ * model cartitem đại diện cho một sản phẩm trong giỏ hàng của user.
+ * được lưu trong subcollection "cart" dưới document của từng user.
+ * đường dẫn truy cập: db.collection("cart").document(userId).collection("items").document(productId)
  */
 @Data
 @NoArgsConstructor
@@ -24,10 +24,10 @@ public class CartItem implements Serializable {
     private double price;
     private int quantity;
     private String imageUrl;
-    private long addedAt;           // Timestamp when added to cart
+    private long addedAt;           // thời gian thêm món vào giỏ hàng (timestamp)
 
     /**
-     * Calculate subtotal for this item (price * quantity)
+     * tính tổng tiền món này (giá nhân với số lượng nha)
      */
     public double getSubtotal() {
         return price * quantity;

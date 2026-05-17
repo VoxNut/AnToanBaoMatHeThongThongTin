@@ -14,8 +14,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 
 /**
- * DAO for Cart operations.
- * Handles cart items stored in Firestore under:
+ * dao xử lý các thao tác giỏ hàng.
+ * xử lý cart items được lưu trên firestore tại:
  * db.collection("cart").document(userId).collection("items")
  */
 public class CartDAO {
@@ -29,8 +29,8 @@ public class CartDAO {
     }
 
     /**
-     * Add item to user's cart
-     * If item already exists, update the quantity
+     * thêm món vào giỏ hàng của user
+     * nếu món đó có sẵn rồi thì cộng dồn số lượng nha
      */
     public void addOrUpdateCartItem(String userId, CartItem cartItem) throws ExecutionException, InterruptedException {
         db.collection(CART_COLLECTION)
@@ -44,7 +44,7 @@ public class CartDAO {
     }
 
     /**
-     * Get all items in user's cart
+     * lấy toàn bộ món trong giỏ hàng của user
      */
     public List<CartItem> getCartItems(String userId) throws ExecutionException, InterruptedException {
         QuerySnapshot querySnapshot = db.collection(CART_COLLECTION)
@@ -63,7 +63,7 @@ public class CartDAO {
     }
 
     /**
-     * Get single item from cart
+     * lấy một món cụ thể trong giỏ hàng
      */
     public CartItem getCartItem(String userId, String productId) throws ExecutionException, InterruptedException {
         DocumentSnapshot doc = db.collection(CART_COLLECTION)
@@ -81,7 +81,7 @@ public class CartDAO {
     }
 
     /**
-     * Update quantity of an item in cart
+     * cập nhật số lượng của một món trong giỏ hàng
      */
     public void updateCartItemQuantity(String userId, String productId, int newQuantity) throws ExecutionException, InterruptedException {
         if (newQuantity <= 0) {
@@ -99,7 +99,7 @@ public class CartDAO {
     }
 
     /**
-     * Remove item from cart
+     * xóa món khỏi giỏ hàng
      */
     public void removeCartItem(String userId, String productId) throws ExecutionException, InterruptedException {
         db.collection(CART_COLLECTION)
@@ -113,7 +113,7 @@ public class CartDAO {
     }
 
     /**
-     * Clear entire cart (all items)
+     * xóa sạch giỏ hàng (xóa mọi món)
      */
     public void clearCart(String userId) throws ExecutionException, InterruptedException {
         List<CartItem> items = getCartItems(userId);
@@ -131,7 +131,7 @@ public class CartDAO {
     }
 
     /**
-     * Calculate cart total
+     * tính tổng tiền của cả giỏ hàng
      */
     public double getCartTotal(String userId) throws ExecutionException, InterruptedException {
         List<CartItem> items = getCartItems(userId);
@@ -145,7 +145,7 @@ public class CartDAO {
     }
 
     /**
-     * Get cart item count
+     * lấy số lượng món trong giỏ hàng
      */
     public int getCartItemCount(String userId) throws ExecutionException, InterruptedException {
         List<CartItem> items = getCartItems(userId);

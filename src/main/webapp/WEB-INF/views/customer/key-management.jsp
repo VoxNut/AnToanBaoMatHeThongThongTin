@@ -8,12 +8,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Khóa Chữ Ký - Online Beverage Store</title>
-    <!-- Google Fonts -->
+    <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Global CSS -->
+    <!-- file css dùng chung cho cả web -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/store.css?v=1.0">
     

@@ -9,14 +9,14 @@ import com.beveragestore.model.Order;
 
 public class CryptoUtil {
 
-    // Generate RSA 2048-bit Key Pair
+    // tạo cặp khóa rsa 2048-bit
     public static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(2048);
         return keyGen.generateKeyPair();
     }
 
-    // Convert PublicKey to PEM string
+    // chuyển publickey thành chuỗi pem
     public static String publicKeyToPem(PublicKey publicKey) {
         String base64 = Base64.getEncoder().encodeToString(publicKey.getEncoded());
         return "-----BEGIN PUBLIC KEY-----\n" +
@@ -24,7 +24,7 @@ public class CryptoUtil {
                 "\n-----END PUBLIC KEY-----";
     }
 
-    // Convert PrivateKey to PEM string
+    // chuyển privatekey thành chuỗi pem
     public static String privateKeyToPem(PrivateKey privateKey) {
         String base64 = Base64.getEncoder().encodeToString(privateKey.getEncoded());
         return "-----BEGIN PRIVATE KEY-----\n" +
@@ -45,7 +45,7 @@ public class CryptoUtil {
         return sb.toString();
     }
 
-    // Load PublicKey from PEM string
+    // nạp publickey từ chuỗi pem
     public static PublicKey pemToPublicKey(String pem) throws Exception {
         String cleanPem = pem
                 .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -57,7 +57,7 @@ public class CryptoUtil {
         return kf.generatePublic(spec);
     }
 
-    // Load PrivateKey from PEM string
+    // nạp privatekey từ chuỗi pem
     public static PrivateKey pemToPrivateKey(String pem) throws Exception {
         String cleanPem = pem
                 .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -69,14 +69,14 @@ public class CryptoUtil {
         return kf.generatePrivate(spec);
     }
 
-    // Hash text data using SHA-256
+    // băm dữ liệu dạng text bằng sha-256
     public static String sha256(String data) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hashBytes = digest.digest(data.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hashBytes);
     }
 
-    // Calculate deterministic hash for Order data
+    // tính mã băm (hash) đặc trưng cho dữ liệu đơn hàng
     public static String calculateOrderHash(Order order) throws NoSuchAlgorithmException {
         StringBuilder sb = new StringBuilder();
         sb.append(order.getOrderId()).append("|");
@@ -94,7 +94,7 @@ public class CryptoUtil {
         return sha256(sb.toString());
     }
 
-    // Sign a hash using a PrivateKey
+    // ký lên mã băm bằng privatekey
     public static String sign(String hash, PrivateKey privateKey) throws Exception {
         Signature sig = Signature.getInstance("SHA256withRSA");
         sig.initSign(privateKey);
@@ -103,7 +103,7 @@ public class CryptoUtil {
         return Base64.getEncoder().encodeToString(signatureBytes);
     }
 
-    // Verify a signature using a PublicKey
+    // xác thực chữ ký số bằng publickey
     public static boolean verify(String hash, String signature, PublicKey publicKey) {
         try {
             Signature sig = Signature.getInstance("SHA256withRSA");

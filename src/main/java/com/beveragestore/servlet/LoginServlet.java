@@ -17,10 +17,10 @@ import com.beveragestore.model.User;
 import com.beveragestore.util.SessionUtil;
 
 /**
- * Servlet for user login.
- * Authenticates user credentials against Firestore.
- * On success, stores user in session and redirects based on role.
- * On failure, redirects to login with error message.
+ * servlet đăng nhập hệ thống.
+ * xác thực thông tin tài khoản user với firestore.
+ * nếu thành công thì lưu user vào session rồi chuyển hướng dựa trên role.
+ * nếu thất bại thì quay lại trang login kèm thông báo lỗi.
  */
 public class LoginServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(LoginServlet.class);
@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // If user is already logged in, redirect to appropriate dashboard
+        // nếu user đã đăng nhập rồi thì chuyển hướng về trang dashboard tương ứng luôn
         User loggedInUser = SessionUtil.getUserFromSession(request.getSession(false));
         if (loggedInUser != null) {
             if (loggedInUser.isAdmin()) {
@@ -45,7 +45,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Show login form
+        // hiển thị form đăng nhập
         request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
@@ -54,7 +54,7 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // Validate input
+        // kiểm tra tính hợp lệ của dữ liệu đầu vào (validate)
         if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Email and password are required");
             logger.warn("Login attempt with missing credentials");
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         try {
-            // Authenticate user
+            // xác thực tài khoản người dùng
             User user = userDAO.findByEmailAndPassword(email, password);
 
             if (user == null) {
@@ -80,13 +80,13 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            // Login successful - store user in session
+            // đăng nhập thành công -> lưu thông tin user vào session
             HttpSession session = request.getSession(true);
             SessionUtil.setUserInSession(session, user);
 
             logger.info("User logged in successfully: {} (role: {})", user.getEmail(), user.getRole());
 
-            // Redirect based on role
+            // chuyển hướng trang tương ứng với quyền (role)
             if (user.isAdmin()) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard?msg=login");
             } else {

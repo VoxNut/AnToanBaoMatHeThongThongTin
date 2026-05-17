@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Order model representing a customer's order.
- * Stored in the "orders" Firestore collection.
+ * model order đại diện cho đơn hàng của khách.
+ * được lưu trong collection "orders" trên firestore.
  */
 @Data
 @NoArgsConstructor
@@ -20,28 +20,28 @@ import java.util.List;
 public class Order implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // Order status constants
+    // các hằng số định nghĩa trạng thái đơn hàng
     public static final String STATUS_PENDING = "PENDING";
     public static final String STATUS_PROCESSING = "PROCESSING";
     public static final String STATUS_SHIPPED = "SHIPPED";
     public static final String STATUS_DELIVERED = "DELIVERED";
     public static final String STATUS_CANCELLED = "CANCELLED";
 
-    private String orderId;         // Firestore document ID
-    private String userId;          // Reference to user
-    private List<OrderItem> items;  // List of items in this order
+    private String orderId;         // id document trên firestore
+    private String userId;          // liên kết (reference) tới user
+    private List<OrderItem> items;  // danh sách các món trong đơn hàng này
     private double totalAmount;
-    private String status;          // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    private String status;          // các trạng thái đơn hàng: pending, processing, shipped, delivered, cancelled
     private String shippingAddress;
     private Date createdAt;
     private Date updatedAt;
-    private String notes;           // Optional notes/instructions
+    private String notes;           // ghi chú tùy chọn của khách hàng
 
-    // Signature verification fields
+    // các trường phục vụ cho việc xác minh chữ ký số
     private String signature;
     private String signedHash;
     private String publicKeyId;
-    private String signatureStatus; // "VALID", "INVALID", "REVOKED_KEY"
+    private String signatureStatus; // "VALID", "INVALID", "REVOKED_KEY" (các trạng thái xác thực của chữ ký)
 
     public int getTotalItems() {
 
@@ -50,7 +50,7 @@ public class Order implements Serializable {
     }
 
     /**
-     * Nested class representing a single item within an order.
+     * class lồng đại diện cho một chi tiết món hàng trong đơn.
      */
     @Data
     @NoArgsConstructor

@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Product model representing a beverage product.
- * Stored in the "products" Firestore collection.
+ * model product đại diện cho sản phẩm đồ uống.
+ * được lưu trong collection "products" trên firestore.
  */
 @Data
 @NoArgsConstructor
@@ -19,15 +19,15 @@ import java.util.Date;
 public class Product implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String productId;       // Firestore document ID
+    private String productId;       // id document trên firestore
     private String name;
-    private String category;        // e.g., "Water", "Soft Drinks", "Coffee", "Juice", "Tea", "Alcohol", "Energy Drinks"
+    private String category;        // ví dụ: "Water", "Soft Drinks", "Coffee", "Juice", "Tea", "Alcohol", "Energy Drinks"
     private String brand;
     private String description;
     private double price;
-    private int stock;              // Available quantity
-    private String imageUrl;        // URL to product image
-    private boolean isActive;       // Soft delete
+    private int stock;              // số lượng sản phẩm còn lại trong kho
+    private String imageUrl;        // đường dẫn (url) ảnh sản phẩm
+    private boolean isActive;       // xóa mềm (soft delete)
     private Date createdAt;
     private Date updatedAt;
 
