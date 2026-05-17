@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.google.cloud.firestore.annotation.Exclude;
 import java.io.Serializable;
 
 /**
@@ -29,6 +30,7 @@ public class CartItem implements Serializable {
     /**
      * tính tổng tiền món này (giá nhân với số lượng nha)
      */
+    @Exclude
     public double getSubtotal() {
         return price * quantity;
     }

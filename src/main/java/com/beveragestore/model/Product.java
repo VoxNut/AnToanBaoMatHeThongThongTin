@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.google.cloud.firestore.annotation.Exclude;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -31,6 +32,7 @@ public class Product implements Serializable {
     private Date createdAt;
     private Date updatedAt;
 
+    @Exclude
     public boolean isLowStock() {
         return stock < 10;
     }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.google.cloud.firestore.annotation.Exclude;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +44,7 @@ public class Order implements Serializable {
     private String publicKeyId;
     private String signatureStatus; // "VALID", "INVALID", "REVOKED_KEY" (các trạng thái xác thực của chữ ký)
 
+    @Exclude
     public int getTotalItems() {
 
         if (items == null) return 0;
@@ -65,6 +67,7 @@ public class Order implements Serializable {
         private int quantity;
         private String imageUrl;
 
+        @Exclude
         public double getSubtotal() {
             return unitPrice * quantity;
         }

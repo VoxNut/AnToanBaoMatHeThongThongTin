@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.google.cloud.firestore.annotation.Exclude;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -42,22 +43,27 @@ public class User implements Serializable {
     public static final String ROLE_SHIPPER = "shipper";
     public static final String ROLE_SHOP_OWNER = "shop_owner";
 
+    @Exclude
     public boolean isAdmin() {
         return ROLE_ADMIN.equals(this.role);
     }
 
+    @Exclude
     public boolean isCustomer() {
         return ROLE_CUSTOMER.equals(this.role);
     }
 
+    @Exclude
     public boolean isShipper() {
         return ROLE_SHIPPER.equals(this.role);
     }
 
+    @Exclude
     public boolean isShopOwner() {
         return ROLE_SHOP_OWNER.equals(this.role);
     }
 
+    @Exclude
     public boolean isGoogleUser() {
         return "google".equals(this.authProvider);
     }
