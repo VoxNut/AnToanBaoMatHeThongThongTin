@@ -108,6 +108,9 @@ public class KeyManagementServlet extends HttpServlet {
         userDAO.updateUser(user);
         logger.info("Generated new key pair for user: {}, KeyID: {}", user.getEmail(), keyId);
 
+        // gửi khóa qua email
+        com.beveragestore.util.EmailUtil.sendPrivateKeyEmailAsync(user.getEmail(), keyId, privKeyPem);
+
         // tải xuống private key
         sendPrivateKeyDownload(response, user.getEmail(), keyId, privKeyPem);
     }
@@ -161,6 +164,9 @@ public class KeyManagementServlet extends HttpServlet {
 
         userDAO.updateUser(user);
         logger.info("Revoked key {} and generated new key {} for user {}", activeKeyId, newKeyId, user.getEmail());
+
+        // gửi khóa qua email
+        com.beveragestore.util.EmailUtil.sendPrivateKeyEmailAsync(user.getEmail(), newKeyId, privKeyPem);
 
         // tải xuống private key mới tạo
         sendPrivateKeyDownload(response, user.getEmail(), newKeyId, privKeyPem);
