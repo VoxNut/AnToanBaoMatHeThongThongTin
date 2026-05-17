@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.google.cloud.firestore.annotation.Exclude;
+import com.google.cloud.firestore.annotation.IgnoreExtraProperties;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@IgnoreExtraProperties
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -72,6 +74,7 @@ public class User implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @IgnoreExtraProperties
     public static class PublicKeyRecord implements Serializable {
         private static final long serialVersionUID = 1L;
         private String keyId;
