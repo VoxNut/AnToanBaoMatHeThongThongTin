@@ -74,6 +74,17 @@
             color: var(--text-primary);
         }
     </style>
+    <script>
+        function validateKeyForm(form) {
+            var checkboxes = form.querySelectorAll('input[name="receiveMethod"]');
+            var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
+            if (!checkedOne) {
+                alert('Vui lòng chọn ít nhất một phương thức nhận khóa bí mật (tải về hoặc gửi email).');
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
 
@@ -94,6 +105,11 @@
         <c:if test="${not empty error}">
             <div class="alert alert-danger" style="margin-bottom: 20px; padding: 10px; background: #f8d7da; color: #721c24; border-radius: 4px;">
                 ${error}
+            </div>
+        </c:if>
+        <c:if test="${not empty success}">
+            <div class="alert alert-success" style="margin-bottom: 20px; padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; border: 1px solid #c3e6cb;">
+                ${success}
             </div>
         </c:if>
         
@@ -119,13 +135,26 @@
                 <p style="font-size: 14px; margin-bottom: 15px;">
                     Nếu bạn nghi ngờ khóa bí mật (Private Key) đã bị lộ hoặc bị mất, vui lòng báo mất ngay lập tức. Hệ thống sẽ vô hiệu hóa khóa này từ thời điểm bạn chọn và tự động tạo khóa mới cho bạn.
                 </p>
-                <form action="${pageContext.request.contextPath}/customer/keys" method="post" class="form-inline">
+                <form action="${pageContext.request.contextPath}/customer/keys" method="post" class="form-inline" onsubmit="return validateKeyForm(this);">
                     <input type="hidden" name="action" value="revoke">
                     <div style="margin-bottom: 15px;">
                         <label for="revokeTime" style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 5px;">Thời gian lộ khóa (Nếu để trống sẽ mặc định là hiện tại):</label>
                         <input type="datetime-local" id="revokeTime" name="revokeTime" class="form-control" style="padding: 8px; width: 100%; max-width: 300px; border: 1px solid #ced4da; border-radius: 4px;">
                     </div>
-                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545;" onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khóa này không? Khóa mới sẽ tự động được tải về.');">
+                    <div style="margin: 15px 0; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left;">
+                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary);">Tùy chọn nhận Khóa Bí Mật (Private Key) mới:</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
+                                <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
+                                Tải file .pem trực tiếp về máy
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
+                                <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
+                                Gửi qua email đã đăng ký (<%= userKeys.getEmail() %>)
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545;" onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khóa này không? Khóa mới sẽ được gửi theo phương thức đã chọn.');">
                         Báo mất & Tạo khóa mới
                     </button>
                 </form>
@@ -138,8 +167,21 @@
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
                     Để đặt hàng, bạn cần tạo một cặp khóa. Khóa công khai sẽ lưu trên web và khóa bí mật sẽ do bạn tự quản lý để ký giao dịch.
                 </p>
-                <form action="${pageContext.request.contextPath}/customer/keys" method="post">
+                <form action="${pageContext.request.contextPath}/customer/keys" method="post" onsubmit="return validateKeyForm(this);">
                     <input type="hidden" name="action" value="generate">
+                    <div style="margin: 15px auto 20px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left; max-width: 400px;">
+                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary); text-align: center;">Tùy chọn nhận Khóa Bí Mật (Private Key):</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin: 0 auto;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
+                                <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
+                                Tải file .pem trực tiếp về máy
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
+                                <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
+                                Gửi qua email đã đăng ký (<%= userKeys != null ? userKeys.getEmail() : "" %>)
+                            </label>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary">Tạo cặp khóa mới</button>
                 </form>
             </div>
