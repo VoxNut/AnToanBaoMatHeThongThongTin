@@ -1,8 +1,18 @@
 package com.beveragestore.util;
 
 import java.util.Properties;
-import javax.mail.*;
-import javax.mail.internet.*;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +26,8 @@ public class EmailUtil {
     // các cấu hình smtp mặc định (có thể đổi qua gmail)
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
-    private static final String FROM_EMAIL = System.getenv("SMTP_EMAIL") != null ? System.getenv("SMTP_EMAIL") : "thegrinderystore@gmail.com";
-    private static final String FROM_PASSWORD = System.getenv("SMTP_PASSWORD") != null ? System.getenv("SMTP_PASSWORD") : "your-app-password";
+    private static final String FROM_EMAIL = System.getenv("SMTP_EMAIL");
+    private static final String FROM_PASSWORD = System.getenv("SMTP_PASSWORD");
 
     /**
      * gửi email bất đồng bộ chứa file khóa bí mật pem.
