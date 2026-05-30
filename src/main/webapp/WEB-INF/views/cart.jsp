@@ -48,9 +48,9 @@
                 </div>
                 <div class="item-details">
                     <h3><%= item.getName() %></h3>
-                    <p>$<%= String.format("%.2f", item.getPrice()) %> <fmt:message key="cart.each" /></p>
+                    <p><%= String.format("%,.0f VNĐ", item.getPrice()) %> <fmt:message key="cart.each" /></p>
                 </div>
-                <div class="item-price">$<%= String.format("%.2f", item.getSubtotal()) %></div>
+                <div class="item-price"><%= String.format("%,.0f VNĐ", item.getSubtotal()) %></div>
                 <form method="POST" action="${pageContext.request.contextPath}/customer/cart" class="item-qty-form" style="display: contents;">
                     <input type="hidden" name="action" value="update">
                     <input type="hidden" name="productId" value="<%= item.getProductId() %>">
@@ -72,7 +72,7 @@
 
             <div class="summary-row">
                 <span><fmt:message key="cart.subtotal" /></span>
-                <span>$<%= String.format("%.2f", request.getAttribute("cartTotal")) %></span>
+                <span><%= String.format("%,.0f VNĐ", request.getAttribute("cartTotal")) %></span>
             </div>
 
             <div class="summary-row">
@@ -82,12 +82,12 @@
 
             <div class="summary-row">
                 <span><fmt:message key="cart.tax" /></span>
-                <span>$<%= String.format("%.2f", ((double) request.getAttribute("cartTotal") * 0.08)) %></span>
+                <span><%= String.format("%,.0f VNĐ", ((double) request.getAttribute("cartTotal") * 0.08)) %></span>
             </div>
 
             <div class="summary-total">
                 <span><fmt:message key="cart.total" /></span>
-                <span>$<%= String.format("%.2f", ((double) request.getAttribute("cartTotal") * 1.08)) %></span>
+                <span><%= String.format("%,.0f VNĐ", ((double) request.getAttribute("cartTotal") * 1.08)) %></span>
             </div>
 
             <div class="summary-actions">

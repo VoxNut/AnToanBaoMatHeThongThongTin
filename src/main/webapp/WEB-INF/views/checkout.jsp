@@ -85,7 +85,7 @@
                 %>
                 <div class="summary-item">
                     <span class="item-name"><%= item.getName() %> (x<%= item.getQuantity() %>)</span>
-                    <span class="item-price">$<%= String.format("%.2f", item.getSubtotal()) %></span>
+                    <span class="item-price"><%= String.format("%,.0f VNĐ", item.getSubtotal()) %></span>
                 </div>
                 <%
                         }
@@ -95,7 +95,7 @@
 
             <div class="summary-row">
                 <span><fmt:message key="cart.subtotal" /></span>
-                <span>$<%= String.format("%.2f", request.getAttribute("cartTotal")) %></span>
+                <span><%= String.format("%,.0f VNĐ", request.getAttribute("cartTotal")) %></span>
             </div>
 
             <div class="summary-row">
@@ -105,12 +105,12 @@
 
             <div class="summary-row">
                 <span><fmt:message key="cart.tax" /></span>
-                <span>$<%= String.format("%.2f", ((double) request.getAttribute("cartTotal") * 0.08)) %></span>
+                <span><%= String.format("%,.0f VNĐ", ((double) request.getAttribute("cartTotal") * 0.08)) %></span>
             </div>
 
             <div class="summary-total">
                 <span><fmt:message key="checkout.total_to_pay" /></span>
-                <span>$<%= String.format("%.2f", ((double) request.getAttribute("cartTotal") * 1.08)) %></span>
+                <span><%= String.format("%,.0f VNĐ", ((double) request.getAttribute("cartTotal") * 1.08)) %></span>
             </div>
         </div>
     </div>

@@ -79,7 +79,7 @@
                         </td>
                         <td style="font-weight: 500;"><%= p.getName() %></td>
                         <td><%= p.getCategory() %></td>
-                        <td>$<%= String.format("%.2f", p.getPrice()) %></td>
+                        <td><%= String.format("%,.0f VNĐ", p.getPrice()) %></td>
                         <td>
                             <span class="<%= p.getStock() < 10 ? "stock-low" : "" %>"><%= p.getStock() %></span>
                         </td>

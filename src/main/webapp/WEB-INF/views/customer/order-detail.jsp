@@ -54,7 +54,7 @@
             </div>
             <div class="info-item">
                 <span class="info-label">Total Amount</span>
-                <span class="info-value" style="color: var(--accent-primary); font-size: 18px;">$<%= String.format("%.2f", order.getTotalAmount()) %></span>
+                <span class="info-value" style="color: var(--accent-primary); font-size: 18px;"><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></span>
             </div>
         </div>
     </div>
@@ -113,9 +113,9 @@
                             <% for (Order.OrderItem item : order.getItems()) { %>
                             <tr>
                                 <td><%= item.getProductName() %></td>
-                                <td>$<%= String.format("%.2f", item.getUnitPrice()) %></td>
+                                <td><%= String.format("%,.0f VNĐ", item.getUnitPrice()) %></td>
                                 <td><%= item.getQuantity() %></td>
-                                <td>$<%= String.format("%.2f", item.getSubtotal()) %></td>
+                                <td><%= String.format("%,.0f VNĐ", item.getSubtotal()) %></td>
                             </tr>
                             <% } %>
                         </tbody>
@@ -130,7 +130,7 @@
                 <h3>Order Summary</h3>
                 <div class="summary-row">
                     <span>Subtotal:</span>
-                    <span>$<%= String.format("%.2f", order.getTotalAmount()) %></span>
+                    <span><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping:</span>
@@ -138,11 +138,11 @@
                 </div>
                 <div class="summary-row">
                     <span>Tax (8%):</span>
-                    <span>$<%= String.format("%.2f", (order.getTotalAmount() * 0.08)) %></span>
+                    <span><%= String.format("%,.0f VNĐ", (order.getTotalAmount() * 0.08)) %></span>
                 </div>
                 <div class="summary-total">
                     <span>Total Paid:</span>
-                    <span>$<%= String.format("%.2f", (order.getTotalAmount() * 1.08)) %></span>
+                    <span><%= String.format("%,.0f VNĐ", (order.getTotalAmount() * 1.08)) %></span>
                 </div>
 
                 <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">

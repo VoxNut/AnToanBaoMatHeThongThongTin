@@ -74,7 +74,7 @@
                             <div class="product-brand">${product.brand}</div>
                             <div class="product-description">${product.description}</div>
                             <div class="product-footer">
-                                <div class="product-price">$${product.price}</div>
+                                <div class="product-price"><fmt:formatNumber value="${product.price}" pattern="#,##0"/> VNĐ</div>
                                 <div class="product-stock">
                                     <c:choose>
                                         <c:when test="${product.stock > 10}">

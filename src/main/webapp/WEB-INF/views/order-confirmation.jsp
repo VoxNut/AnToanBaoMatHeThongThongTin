@@ -52,7 +52,7 @@
             </div>
             <div class="summary-row" style="margin-top: var(--spacing-md);">
                 <span style="font-weight: 500; color: var(--text-primary);"><fmt:message key="order.total_amount" />:</span>
-                <span style="color: var(--accent-primary); font-weight: 600; font-size: 18px;">$<%= String.format("%.2f", order.getTotalAmount()) %></span>
+                <span style="color: var(--accent-primary); font-weight: 600; font-size: 18px;"><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></span>
             </div>
         </div>
 
@@ -61,7 +61,7 @@
             <% for (Order.OrderItem item : order.getItems()) { %>
             <div class="summary-row">
                 <span><%= item.getProductName() %> (x<%= item.getQuantity() %>)</span>
-                <span style="font-weight: 500;">$<%= String.format("%.2f", item.getSubtotal()) %></span>
+                <span style="font-weight: 500;"><%= String.format("%,.0f VNĐ", item.getSubtotal()) %></span>
             </div>
             <% } %>
         </div>

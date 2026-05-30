@@ -42,7 +42,7 @@
             </div>
             <div class="stat-card revenue">
                 <div class="stat-label">Total Revenue</div>
-                <div class="stat-value">$<%= String.format("%.2f", (double) request.getAttribute("totalRevenue")) %></div>
+                <div class="stat-value"><%= String.format("%,.0f VNĐ", (double) request.getAttribute("totalRevenue")) %></div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Registered Users</div>

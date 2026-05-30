@@ -50,7 +50,7 @@
                 <h1 class="detail-title"><%= product.getName() %></h1>
                 <div class="detail-brand"><fmt:message key="product.detail.by" /> <%= product.getBrand() %></div>
                 
-                <div class="detail-price">$<%= String.format("%.2f", product.getPrice()) %></div>
+                <div class="detail-price"><%= String.format("%,.0f VNĐ", product.getPrice()) %></div>
 
                 <div class="detail-description">
                     <%= product.getDescription() %>

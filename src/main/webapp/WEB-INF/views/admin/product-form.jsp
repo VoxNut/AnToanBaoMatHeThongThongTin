@@ -64,8 +64,8 @@
                         <input type="text" name="brand" class="form-control" value="<%= p != null ? p.getBrand() : "" %>">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Price ($) *</label>
-                        <input type="number" name="price" step="0.01" min="0" class="form-control" required value="<%= p != null ? p.getPrice() : "" %>">
+                        <label class="form-label">Price (VNĐ) *</label>
+                        <input type="number" name="price" step="1000" min="0" class="form-control" required value="<%= p != null ? String.format("%.0f", p.getPrice()) : "" %>">
                     </div>
                 </div>
 

@@ -97,7 +97,7 @@
                             </span>
                         </td>
                         <td><%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(o.getCreatedAt()) %></td>
-                        <td style="font-weight: 500;">$<%= String.format("%.2f", o.getTotalAmount()) %></td>
+                        <td style="font-weight: 500;"><%= String.format("%,.0f VNĐ", o.getTotalAmount()) %></td>
                         <td>
                             <span style="display: inline-flex; align-items: center; padding: 4px 8px; border-radius: var(--border-radius); font-size: 11px; font-weight: 600; color: <%= badgeColor %>; background-color: <%= badgeBg %>; border: 1px solid <%= badgeColor %>22;">
                                 <%= badgeIcon %>

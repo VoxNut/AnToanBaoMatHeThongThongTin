@@ -33,6 +33,9 @@ public class DatabaseSeeder {
             ProductDAO productDAO = new ProductDAO();
             OrderDAO orderDAO = new OrderDAO();
 
+            // 0. Chuyển đổi dữ liệu từ USD sang VND nếu có sẵn
+            migrateDollarToVnd(productDAO, orderDAO);
+
             // 1. nạp dữ liệu mẫu cho user
             logger.info("Seeding Users...");
             List<User> users = seedUsers(userDAO);
@@ -142,7 +145,7 @@ public class DatabaseSeeder {
                 .category("Coffee")
                 .brand("Grindery Reserve")
                 .description("A bright, floral light roast with notes of jasmine and bergamot. Ethically sourced from Yirgacheffe.")
-                .price(24.00)
+                .price(600000.00)
                 .stock(50)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/coffee_bag_1.jpg")
                 .isActive(true)
@@ -156,7 +159,7 @@ public class DatabaseSeeder {
                 .category("Coffee")
                 .brand("Grindery Reserve")
                 .description("A balanced medium roast featuring notes of chocolate, caramel, and a hint of cherry.")
-                .price(22.00)
+                .price(550000.00)
                 .stock(30)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/coffee_bag_2.jpg")
                 .isActive(true)
@@ -170,7 +173,7 @@ public class DatabaseSeeder {
                 .category("Coffee")
                 .brand("Grindery Reserve")
                 .description("Earthy and full-bodied dark roast with low acidity and notes of dark chocolate and spice.")
-                .price(23.50)
+                .price(590000.00)
                 .stock(45)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/coffee_bag_3.jpg")
                 .isActive(true)
@@ -184,7 +187,7 @@ public class DatabaseSeeder {
                 .category("Tea")
                 .brand("Grindery Reserve")
                 .description("Premium stone-ground ceremonial matcha from Uji, Japan. Vibrant green color and smooth umami flavor.")
-                .price(35.00)
+                .price(880000.00)
                 .stock(20)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/matcha.jpg")
                 .isActive(true)
@@ -198,7 +201,7 @@ public class DatabaseSeeder {
                 .category("Tea")
                 .brand("Grindery Reserve")
                 .description("Classic black tea infused with premium Italian bergamot oil.")
-                .price(18.00)
+                .price(450000.00)
                 .stock(60)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/earl_grey.jpg")
                 .isActive(true)
@@ -212,7 +215,7 @@ public class DatabaseSeeder {
                 .category("Goods")
                 .brand("Chemex")
                 .description("The classic 8-cup Chemex pour-over glass coffeemaker. Made of non-porous Borosilicate glass.")
-                .price(48.00)
+                .price(1200000.00)
                 .stock(15)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/chemex.jpg")
                 .isActive(true)
@@ -226,7 +229,7 @@ public class DatabaseSeeder {
                 .category("Goods")
                 .brand("Hario")
                 .description("Size 02 ceramic coffee dripper in white. Retains heat to ensure a constant temperature throughout the brewing cycle.")
-                .price(25.00)
+                .price(620000.00)
                 .stock(25)
                 .imageUrl("https://res.cloudinary.com/dbpl94opl/image/upload/v1714000000/v60.jpg")
                 .isActive(true)
@@ -344,5 +347,41 @@ public class DatabaseSeeder {
                 .build();
         orderDAO.createOrder(order3);
         logger.info("Created Order 3 (DELIVERED) for {}", customer1.getEmail());
+    }
+
+    private static void migrateDollarToVnd(ProductDAO productDAO, OrderDAO orderDAO) throws Exception {
+        logger.info("Checking for product and order currency migration to VND...");
+        
+        List<Product> products = productDAO.getAllProducts();
+        for (Product p : products) {
+            if (p.getPrice() < 1000.0) {
+                double oldPrice = p.getPrice();
+                double newPrice = oldPrice * 25000.0;
+                p.setPrice(newPrice);
+                productDAO.updateProduct(p);
+                logger.info("Migrated Product: {} ({} -> {} VNĐ)", p.getName(), oldPrice, newPrice);
+            }
+        }
+        
+        List<Order> orders = orderDAO.getAllOrders();
+        for (Order o : orders) {
+            boolean updated = false;
+            if (o.getTotalAmount() < 1000.0) {
+                o.setTotalAmount(o.getTotalAmount() * 25000.0);
+                updated = true;
+            }
+            if (o.getItems() != null) {
+                for (Order.OrderItem item : o.getItems()) {
+                    if (item.getUnitPrice() < 1000.0) {
+                        item.setUnitPrice(item.getUnitPrice() * 25000.0);
+                        updated = true;
+                    }
+                }
+            }
+            if (updated) {
+                orderDAO.updateOrder(o);
+                logger.info("Migrated Order: {} totalAmount -> {} VNĐ", o.getOrderId(), o.getTotalAmount());
+            }
+        }
     }
 }

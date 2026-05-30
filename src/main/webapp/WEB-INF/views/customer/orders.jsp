@@ -44,7 +44,7 @@
                     <span>Date: <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(order.getCreatedAt()) %></span>
                     <span><%= order.getTotalItems() %> items</span>
                 </div>
-                <div class="order-amount">$<%= String.format("%.2f", order.getTotalAmount()) %></div>
+                <div class="order-amount"><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></div>
                 <span class="order-status status-<%= order.getStatus().toLowerCase() %>"><%= order.getStatus() %></span>
             </div>
             <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); window.location='${pageContext.request.contextPath}/customer/order-detail?id=<%= order.getOrderId() %>'">View Details →</button>
