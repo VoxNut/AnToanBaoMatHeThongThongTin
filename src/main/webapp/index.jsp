@@ -63,7 +63,7 @@
                         <input type="hidden" name="action" value="add">
                         <input type="hidden" name="productId" value="<%= p.getProductId() %>">
                         <input type="hidden" name="quantity" value="1">
-                        <button type="submit" class="btn-add"><fmt:message key="home.add_to_cart_price" /> - $<%= String.format("%.2f", p.getPrice()) %></button>
+                        <button type="submit" class="btn-add"><fmt:message key="home.add_to_cart_price" /> - <%= String.format("%,.0f", p.getPrice()) %> VNĐ</button>
                     </form>
                 </div>
             </div>
