@@ -40,7 +40,7 @@ public class EmailUtil {
                 logger.error("lỗi khi gửi email chứa private key tới " + toEmail, e);
                 // in ra console log của tomcat phòng trường hợp không cấu hình được smtp thực tế
                 System.out.println("==================================================");
-                System.out.println("⚠️ KHÔNG THỂ GỬI EMAIL SMTP. THÔNG TIN KHÓA:");
+                System.out.println("KHÔNG THỂ GỬI EMAIL SMTP. THÔNG TIN KHÓA:");
                 System.out.println("Gửi tới: " + toEmail);
                 System.out.println("Key ID: " + keyId);
                 System.out.println("Khóa bí mật (Private Key PEM):\n" + privateKeyPem);
@@ -66,7 +66,7 @@ public class EmailUtil {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(FROM_EMAIL, "The Grindery Coffee"));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-        message.setSubject("🔑 Khóa bí mật (Private Key) đặt hàng của bạn");
+        message.setSubject("Khóa bí mật (Private Key) đặt hàng của bạn");
 
         // tạo nội dung email đa phần (multipart) để đính kèm file
         Multipart multipart = new MimeMultipart();

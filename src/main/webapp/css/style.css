@@ -314,7 +314,8 @@ img {
 }
 
 .btn-danger:hover {
-    background-color: #a82525;
+    background-color: var(--error-text);
+    filter: brightness(0.9);
     color: var(--bg-white);
     transform: translateY(-2px);
 }
