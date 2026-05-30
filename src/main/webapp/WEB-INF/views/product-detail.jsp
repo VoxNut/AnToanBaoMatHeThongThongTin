@@ -4,12 +4,15 @@
 <%@ page import="com.beveragestore.model.Product" %>
 <%@ page import="com.beveragestore.util.SessionUtil" %>
 <%@ page import="com.beveragestore.model.User" %>
+<%
+    Product product = (Product) request.getAttribute("product");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= product.getName() %> - The Grindery</title>
+    <title><%= product != null ? product.getName() : "Sản phẩm" %> - The Grindery</title>
     
     <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,10 +24,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/store.css?v=1.0">
 </head>
 <body>
-
-<%
-    Product product = (Product) request.getAttribute("product");
-%>
 
 <jsp:include page="/WEB-INF/views/partials/header.jsp" />
 

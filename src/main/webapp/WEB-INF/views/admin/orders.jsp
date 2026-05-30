@@ -63,20 +63,31 @@
                        if (orders != null && !orders.isEmpty()) {
                            for (Order o : orders) {
                                String sigStatus = o.getSignatureStatus() != null ? o.getSignatureStatus() : "UNSIGNED";
-                               String badgeColor = "gray";
+                               String badgeBg = "var(--bg-secondary)";
+                               String badgeColor = "var(--text-primary)";
                                String badgeText = "Chưa ký";
+                               String badgeIcon = "<svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' style='margin-right: 4px; vertical-align: text-bottom;'><circle cx='12' cy='12' r='10'></circle><line x1='12' y1='8' x2='12' y2='12'></line><line x1='12' y1='16' x2='12.01' y2='16'></line></svg>";
+                               
                                if ("VALID".equals(sigStatus)) {
-                                   badgeColor = "green";
-                                   badgeText = "✅ Hợp lệ";
+                                   badgeBg = "var(--success-bg)";
+                                   badgeColor = "var(--success-text)";
+                                   badgeText = "Hợp lệ";
+                                   badgeIcon = "<svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' style='margin-right: 4px; vertical-align: text-bottom;'><polyline points='20 6 9 17 4 12'></polyline></svg>";
                                } else if ("INVALID".equals(sigStatus)) {
-                                   badgeColor = "red";
-                                   badgeText = "❌ ĐÃ BỊ SỬA ĐỔI";
+                                   badgeBg = "var(--error-bg)";
+                                   badgeColor = "var(--error-text)";
+                                   badgeText = "ĐÃ BỊ SỬA ĐỔI";
+                                   badgeIcon = "<svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' style='margin-right: 4px; vertical-align: text-bottom;'><line x1='18' y1='6' x2='6' y2='18'></line><line x1='6' y1='6' x2='18' y2='18'></line></svg>";
                                } else if ("REVOKED_KEY".equals(sigStatus)) {
-                                   badgeColor = "orange";
-                                   badgeText = "⚠️ Khóa đã báo mất";
+                                   badgeBg = "#fef3c7";
+                                   badgeColor = "#b45309";
+                                   badgeText = "Khóa đã báo mất";
+                                   badgeIcon = "<svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='margin-right: 4px; vertical-align: text-bottom;'><path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'></path><line x1='12' y1='9' x2='12' y2='13'></line><line x1='12' y1='17' x2='12.01' y2='17'></line></svg>";
                                } else if ("NO_KEY_FOUND".equals(sigStatus)) {
-                                   badgeColor = "red";
-                                   badgeText = "🚫 Mất khóa liên kết";
+                                   badgeBg = "var(--error-bg)";
+                                   badgeColor = "var(--error-text)";
+                                   badgeText = "Mất khóa liên kết";
+                                   badgeIcon = "<svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' style='margin-right: 4px; vertical-align: text-bottom;'><circle cx='12' cy='12' r='10'></circle><line x1='4.93' y1='4.93' x2='19.07' y2='19.07'></line></svg>";
                                }
                     %>
                     <tr>
@@ -88,7 +99,8 @@
                         <td><%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(o.getCreatedAt()) %></td>
                         <td style="font-weight: 500;">$<%= String.format("%.2f", o.getTotalAmount()) %></td>
                         <td>
-                            <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; color: white; background-color: <%= badgeColor %>;">
+                            <span style="display: inline-flex; align-items: center; padding: 4px 8px; border-radius: var(--border-radius); font-size: 11px; font-weight: 600; color: <%= badgeColor %>; background-color: <%= badgeBg %>; border: 1px solid <%= badgeColor %>22;">
+                                <%= badgeIcon %>
                                 <%= badgeText %>
                             </span>
                         </td>
