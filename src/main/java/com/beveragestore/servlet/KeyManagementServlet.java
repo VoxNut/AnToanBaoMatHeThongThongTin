@@ -46,12 +46,6 @@ public class KeyManagementServlet extends HttpServlet {
             user = userDAO.findByUid(user.getUid());
             request.setAttribute("userKeys", user);
 
-            String success = (String) request.getSession().getAttribute("success");
-            if (success != null) {
-                request.setAttribute("success", success);
-                request.getSession().removeAttribute("success");
-            }
-
             request.getRequestDispatcher("/WEB-INF/views/customer/key-management.jsp").forward(request, response);
         } catch (Exception e) {
             logger.error("Error displaying key management", e);
@@ -62,9 +56,8 @@ public class KeyManagementServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        User user = null;
         try {
-            user = SessionUtil.getUserFromSession(request.getSession());
+            User user = SessionUtil.getUserFromSession(request.getSession());
             if (user == null) {
                 response.sendRedirect(request.getContextPath() + "/login");
                 return;
@@ -84,20 +77,8 @@ public class KeyManagementServlet extends HttpServlet {
             }
         } catch (Exception e) {
             logger.error("Error processing key management action", e);
-            try {
-                if (user == null) {
-                    user = SessionUtil.getUserFromSession(request.getSession());
-                }
-                if (user != null) {
-                    user = userDAO.findByUid(user.getUid());
-                }
-                request.setAttribute("userKeys", user);
-                request.setAttribute("error", e.getMessage());
-                request.getRequestDispatcher("/WEB-INF/views/customer/key-management.jsp").forward(request, response);
-            } catch (Exception ex) {
-                request.setAttribute("error", "Lỗi xử lý khóa: " + e.getMessage());
-                request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
-            }
+            request.setAttribute("error", "Lỗi xử lý khóa: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
 
@@ -127,33 +108,8 @@ public class KeyManagementServlet extends HttpServlet {
         userDAO.updateUser(user);
         logger.info("Generated new key pair for user: {}, KeyID: {}", user.getEmail(), keyId);
 
-        String[] receiveMethods = request.getParameterValues("receiveMethod");
-        boolean downloadKey = false;
-        boolean emailKey = false;
-        if (receiveMethods != null) {
-            for (String method : receiveMethods) {
-                if ("download".equals(method)) {
-                    downloadKey = true;
-                } else if ("email".equals(method)) {
-                    emailKey = true;
-                }
-            }
-        } else {
-            downloadKey = true; // mặc định nếu không chọn gì
-        }
-
-        // gửi khóa qua email nếu khách hàng yêu cầu
-        if (emailKey) {
-            com.beveragestore.util.EmailUtil.sendPrivateKeyEmailAsync(user.getEmail(), keyId, privKeyPem);
-        }
-
-        // xử lý phản hồi
-        if (downloadKey) {
-            sendPrivateKeyDownload(response, user.getEmail(), keyId, privKeyPem);
-        } else {
-            request.getSession().setAttribute("success", "tạo khóa thành công! khóa bí mật đã được gửi tới email " + user.getEmail());
-            response.sendRedirect(request.getContextPath() + "/customer/keys");
-        }
+        // tải xuống private key
+        sendPrivateKeyDownload(response, user.getEmail(), keyId, privKeyPem);
     }
 
     private void handleRevokeKeys(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
@@ -165,11 +121,6 @@ public class KeyManagementServlet extends HttpServlet {
                 // dữ liệu đầu vào từ html datetime-local có dạng yyyy-MM-dd'T'HH:mm
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
                 revokeDate = sdf.parse(inputRevokeTimeStr);
-                if (revokeDate.after(new Date())) {
-                    throw new IllegalArgumentException("Thời gian lộ khóa không được ở trong tương lai.");
-                }
-            } catch (IllegalArgumentException e) {
-                throw e;
             } catch (Exception e) {
                 logger.warn("Could not parse revoke date: {}", inputRevokeTimeStr);
             }
@@ -211,33 +162,8 @@ public class KeyManagementServlet extends HttpServlet {
         userDAO.updateUser(user);
         logger.info("Revoked key {} and generated new key {} for user {}", activeKeyId, newKeyId, user.getEmail());
 
-        String[] receiveMethods = request.getParameterValues("receiveMethod");
-        boolean downloadKey = false;
-        boolean emailKey = false;
-        if (receiveMethods != null) {
-            for (String method : receiveMethods) {
-                if ("download".equals(method)) {
-                    downloadKey = true;
-                } else if ("email".equals(method)) {
-                    emailKey = true;
-                }
-            }
-        } else {
-            downloadKey = true; // mặc định nếu không chọn gì
-        }
-
-        // gửi khóa mới qua email nếu khách hàng yêu cầu
-        if (emailKey) {
-            com.beveragestore.util.EmailUtil.sendPrivateKeyEmailAsync(user.getEmail(), newKeyId, privKeyPem);
-        }
-
-        // xử lý phản hồi cho khách hàng
-        if (downloadKey) {
-            sendPrivateKeyDownload(response, user.getEmail(), newKeyId, privKeyPem);
-        } else {
-            request.getSession().setAttribute("success", "làm lại khóa thành công! khóa bí mật mới đã được gửi tới email " + user.getEmail());
-            response.sendRedirect(request.getContextPath() + "/customer/keys");
-        }
+        // tải xuống private key mới tạo
+        sendPrivateKeyDownload(response, user.getEmail(), newKeyId, privKeyPem);
     }
 
     private void sendPrivateKeyDownload(HttpServletResponse response, String email, String keyId, String privKeyPem) throws IOException {

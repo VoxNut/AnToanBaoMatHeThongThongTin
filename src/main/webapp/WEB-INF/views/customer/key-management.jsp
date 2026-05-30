@@ -21,10 +21,10 @@
         .key-container {
             max-width: 800px;
             margin: 2rem auto;
-            background: var(--bg-white);
+            background: #fff;
             padding: 2.5rem;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         .key-badge {
             display: inline-block;
@@ -34,18 +34,18 @@
             font-weight: 600;
             margin-bottom: 10px;
         }
-        .key-badge.active { background: var(--success-bg); color: var(--success-text); }
-        .key-badge.revoked { background: var(--error-bg); color: var(--error-text); }
+        .key-badge.active { background: #d4edda; color: #155724; }
+        .key-badge.revoked { background: #f8d7da; color: #721c24; }
         .key-box {
             font-family: monospace;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             padding: 15px;
-            border-radius: var(--border-radius);
+            border-radius: 6px;
             overflow-x: auto;
             white-space: pre-wrap;
             font-size: 13px;
-            color: var(--text-primary);
+            color: #495057;
             max-height: 150px;
             margin: 10px 0;
         }
@@ -56,63 +56,22 @@
         }
         .key-history-table th, .key-history-table td {
             padding: 10px 15px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #dee2e6;
             text-align: left;
             font-size: 14px;
-            color: var(--text-primary);
         }
         .key-history-table th {
-            background-color: var(--bg-secondary);
+            background-color: #f1f3f5;
             font-weight: 600;
         }
         .revoke-section {
-            background-color: var(--error-bg);
-            border-left: 5px solid var(--error-text);
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
             padding: 15px;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
             margin-top: 2rem;
-            color: var(--text-primary);
         }
     </style>
-    <script>
-        function validateKeyForm(form) {
-            // kiểm tra phương thức nhận khóa
-            var checkboxes = form.querySelectorAll('input[name="receiveMethod"]');
-            var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
-            if (!checkedOne) {
-                alert('Vui lòng chọn ít nhất một phương thức nhận khóa bí mật (tải về hoặc gửi email).');
-                return false;
-            }
-
-            // kiểm tra thời gian lộ khóa không được ở tương lai
-            var revokeTimeInput = form.querySelector('input[name="revokeTime"]');
-            if (revokeTimeInput && revokeTimeInput.value) {
-                var selectedDate = new Date(revokeTimeInput.value);
-                var now = new Date();
-                if (selectedDate > now) {
-                    alert('Thời gian lộ khóa không được ở trong tương lai.');
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            var revokeTimeInput = document.getElementById("revokeTime");
-            if (revokeTimeInput) {
-                // thiết lập max datetime-local là thời gian hiện tại
-                var now = new Date();
-                var year = now.getFullYear();
-                var month = String(now.getMonth() + 1).padStart(2, '0');
-                var day = String(now.getDate()).padStart(2, '0');
-                var hours = String(now.getHours()).padStart(2, '0');
-                var minutes = String(now.getMinutes()).padStart(2, '0');
-                
-                var formattedDateTime = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
-                revokeTimeInput.setAttribute("max", formattedDateTime);
-            }
-        });
-    </script>
 </head>
 <body>
 
@@ -120,10 +79,7 @@
 
 <div class="page-header">
     <div class="container">
-        <h1 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-            Quản Lý Khóa Ký Đơn Hàng
-        </h1>
+        <h1>🔑 Quản Lý Khóa Ký Đơn Hàng</h1>
         <p style="color: var(--text-light); margin-top: 5px;">Hệ thống xác thực và đảm bảo tính toàn vẹn của đơn hàng</p>
     </div>
 </div>
@@ -133,11 +89,6 @@
         <c:if test="${not empty error}">
             <div class="alert alert-danger" style="margin-bottom: 20px; padding: 10px; background: #f8d7da; color: #721c24; border-radius: 4px;">
                 ${error}
-            </div>
-        </c:if>
-        <c:if test="${not empty success}">
-            <div class="alert alert-success" style="margin-bottom: 20px; padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; border: 1px solid #c3e6cb;">
-                ${success}
             </div>
         </c:if>
         
@@ -156,33 +107,17 @@
             </div>
 
             <div class="revoke-section">
-                <h3 style="display: flex; align-items: center; gap: 8px; color: var(--error-text);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    Báo Mất Khóa / Lộ Khóa
-                </h3>
+                <h3>⚠️ Báo Mất Khóa / Lộ Khóa</h3>
                 <p style="font-size: 14px; margin-bottom: 15px;">
                     Nếu bạn nghi ngờ khóa bí mật (Private Key) đã bị lộ hoặc bị mất, vui lòng báo mất ngay lập tức. Hệ thống sẽ vô hiệu hóa khóa này từ thời điểm bạn chọn và tự động tạo khóa mới cho bạn.
                 </p>
-                <form action="${pageContext.request.contextPath}/customer/keys" method="post" class="form-inline" onsubmit="return validateKeyForm(this);">
+                <form action="${pageContext.request.contextPath}/customer/keys" method="post" class="form-inline">
                     <input type="hidden" name="action" value="revoke">
                     <div style="margin-bottom: 15px;">
                         <label for="revokeTime" style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 5px;">Thời gian lộ khóa (Nếu để trống sẽ mặc định là hiện tại):</label>
                         <input type="datetime-local" id="revokeTime" name="revokeTime" class="form-control" style="padding: 8px; width: 100%; max-width: 300px; border: 1px solid #ced4da; border-radius: 4px;">
                     </div>
-                    <div style="margin: 15px 0; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left;">
-                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary);">Tùy chọn nhận Khóa Bí Mật (Private Key) mới:</p>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
-                                <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Tải file .pem trực tiếp về máy
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
-                                <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Gửi qua email đã đăng ký (<%= userKeys.getEmail() %>)
-                            </label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545;" onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khóa này không? Khóa mới sẽ được gửi theo phương thức đã chọn.');">
+                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545;" onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khóa này không? Khóa mới sẽ tự động được tải về.');">
                         Báo mất & Tạo khóa mới
                     </button>
                 </form>
@@ -195,21 +130,8 @@
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
                     Để đặt hàng, bạn cần tạo một cặp khóa. Khóa công khai sẽ lưu trên web và khóa bí mật sẽ do bạn tự quản lý để ký giao dịch.
                 </p>
-                <form action="${pageContext.request.contextPath}/customer/keys" method="post" onsubmit="return validateKeyForm(this);">
+                <form action="${pageContext.request.contextPath}/customer/keys" method="post">
                     <input type="hidden" name="action" value="generate">
-                    <div style="margin: 15px auto 20px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left; max-width: 400px;">
-                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary); text-align: center;">Tùy chọn nhận Khóa Bí Mật (Private Key):</p>
-                        <div style="display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin: 0 auto;">
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
-                                <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Tải file .pem trực tiếp về máy
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
-                                <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Gửi qua email đã đăng ký (<%= userKeys != null ? userKeys.getEmail() : "" %>)
-                            </label>
-                        </div>
-                    </div>
                     <button type="submit" class="btn btn-primary">Tạo cặp khóa mới</button>
                 </form>
             </div>

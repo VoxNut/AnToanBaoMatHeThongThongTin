@@ -308,6 +308,17 @@ img {
     color: var(--bg-white);
 }
 
+.btn-danger {
+    background-color: var(--error-text);
+    color: var(--bg-white);
+}
+
+.btn-danger:hover {
+    background-color: #a82525;
+    color: var(--bg-white);
+    transform: translateY(-2px);
+}
+
 /* ==========================================================================
    Forms
    ========================================================================== */

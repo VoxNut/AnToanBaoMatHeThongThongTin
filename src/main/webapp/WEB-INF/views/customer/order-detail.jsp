@@ -26,6 +26,20 @@
         Order order = (Order) request.getAttribute("order");
         if (order != null) {
     %>
+    <%
+        String success = (String) request.getAttribute("success");
+        String errorMsg = (String) request.getAttribute("error");
+        if (success != null) {
+    %>
+        <div style="background-color: var(--success-bg); color: var(--success-text); padding: 12px 16px; border-radius: var(--border-radius); margin-top: var(--spacing-md); border: 1px solid var(--success-text); font-weight: 500;">
+            <%= success %>
+        </div>
+    <% } %>
+    <% if (errorMsg != null) { %>
+        <div style="background-color: var(--error-bg); color: var(--error-text); padding: 12px 16px; border-radius: var(--border-radius); margin-top: var(--spacing-md); border: 1px solid var(--error-text); font-weight: 500;">
+            <%= errorMsg %>
+        </div>
+    <% } %>
 
     <div class="detail-section" style="margin-top: var(--spacing-lg);">
         <h1 style="margin-bottom: var(--spacing-lg); font-family: var(--font-heading);">Order #<%= order.getOrderId() %></h1>
@@ -141,6 +155,23 @@
                     <h3 style="margin-bottom: var(--spacing-sm); font-size: 14px;">Delivery Notes</h3>
                     <p style="color: var(--text-secondary); font-size: 13px;"><%= order.getNotes() %></p>
                 </div>
+                <% } %>
+
+                <% if (Order.STATUS_PENDING.equals(order.getStatus())) { %>
+                <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                    <form method="POST" action="${pageContext.request.contextPath}/customer/order-detail" onsubmit="return confirmCancel();">
+                        <input type="hidden" name="action" value="cancel" />
+                        <input type="hidden" name="id" value="<%= order.getOrderId() %>" />
+                        <button type="submit" class="btn btn-danger" style="width: 100%;">
+                            Hủy đơn hàng
+                        </button>
+                    </form>
+                </div>
+                <script>
+                    function confirmCancel() {
+                        return confirm("Bạn có chắc chắn muốn hủy đơn hàng này? Số lượng sản phẩm sẽ được tự động hoàn lại vào kho.");
+                    }
+                </script>
                 <% } %>
             </div>
         </div>
