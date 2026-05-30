@@ -76,14 +76,42 @@
     </style>
     <script>
         function validateKeyForm(form) {
+            // kiểm tra phương thức nhận khóa
             var checkboxes = form.querySelectorAll('input[name="receiveMethod"]');
             var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
             if (!checkedOne) {
                 alert('Vui lòng chọn ít nhất một phương thức nhận khóa bí mật (tải về hoặc gửi email).');
                 return false;
             }
+
+            // kiểm tra thời gian lộ khóa không được ở tương lai
+            var revokeTimeInput = form.querySelector('input[name="revokeTime"]');
+            if (revokeTimeInput && revokeTimeInput.value) {
+                var selectedDate = new Date(revokeTimeInput.value);
+                var now = new Date();
+                if (selectedDate > now) {
+                    alert('Thời gian lộ khóa không được ở trong tương lai.');
+                    return false;
+                }
+            }
             return true;
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var revokeTimeInput = document.getElementById("revokeTime");
+            if (revokeTimeInput) {
+                // thiết lập max datetime-local là thời gian hiện tại
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var day = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                var formattedDateTime = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
+                revokeTimeInput.setAttribute("max", formattedDateTime);
+            }
+        });
     </script>
 </head>
 <body>

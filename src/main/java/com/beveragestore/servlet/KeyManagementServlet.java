@@ -62,8 +62,9 @@ public class KeyManagementServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User user = null;
         try {
-            User user = SessionUtil.getUserFromSession(request.getSession());
+            user = SessionUtil.getUserFromSession(request.getSession());
             if (user == null) {
                 response.sendRedirect(request.getContextPath() + "/login");
                 return;
@@ -83,8 +84,20 @@ public class KeyManagementServlet extends HttpServlet {
             }
         } catch (Exception e) {
             logger.error("Error processing key management action", e);
-            request.setAttribute("error", "Lỗi xử lý khóa: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+            try {
+                if (user == null) {
+                    user = SessionUtil.getUserFromSession(request.getSession());
+                }
+                if (user != null) {
+                    user = userDAO.findByUid(user.getUid());
+                }
+                request.setAttribute("userKeys", user);
+                request.setAttribute("error", e.getMessage());
+                request.getRequestDispatcher("/WEB-INF/views/customer/key-management.jsp").forward(request, response);
+            } catch (Exception ex) {
+                request.setAttribute("error", "Lỗi xử lý khóa: " + e.getMessage());
+                request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+            }
         }
     }
 
@@ -152,6 +165,11 @@ public class KeyManagementServlet extends HttpServlet {
                 // dữ liệu đầu vào từ html datetime-local có dạng yyyy-MM-dd'T'HH:mm
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
                 revokeDate = sdf.parse(inputRevokeTimeStr);
+                if (revokeDate.after(new Date())) {
+                    throw new IllegalArgumentException("Thời gian lộ khóa không được ở trong tương lai.");
+                }
+            } catch (IllegalArgumentException e) {
+                throw e;
             } catch (Exception e) {
                 logger.warn("Could not parse revoke date: {}", inputRevokeTimeStr);
             }
