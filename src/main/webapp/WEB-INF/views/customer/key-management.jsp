@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="com.beveragestore.model.User" %>
 <%@ page import="java.util.List" %>
 <!DOCTYPE html>
@@ -7,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Khóa Chữ Ký - Online Beverage Store</title>
+    <title><fmt:message key="key.title" /> - The Grindery</title>
     <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,7 +81,7 @@
             var checkboxes = form.querySelectorAll('input[name="receiveMethod"]');
             var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
             if (!checkedOne) {
-                alert('Vui lòng chọn ít nhất một phương thức nhận khóa bí mật (tải về hoặc gửi email).');
+                alert('<fmt:message key="key.validation.select_method" />');
                 return false;
             }
 
@@ -90,7 +91,7 @@
                 var selectedDate = new Date(revokeTimeInput.value);
                 var now = new Date();
                 if (selectedDate > now) {
-                    alert('Thời gian lộ khóa không được ở trong tương lai.');
+                    alert('<fmt:message key="key.validation.future_date" />');
                     return false;
                 }
             }
@@ -122,9 +123,9 @@
     <div class="container">
         <h1 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-            Quản Lý Khóa Ký Đơn Hàng
+            <fmt:message key="key.title" />
         </h1>
-        <p style="color: var(--text-light); margin-top: 5px;">Hệ thống xác thực và đảm bảo tính toàn vẹn của đơn hàng</p>
+        <p style="color: var(--text-light); margin-top: 5px;"><fmt:message key="key.subtitle" /></p>
     </div>
 </div>
 
@@ -146,44 +147,44 @@
             if (userKeys != null && userKeys.getActivePublicKey() != null) {
         %>
             <div class="card" style="margin-bottom: 2rem; border: 1px solid #ced4da; padding: 20px; border-radius: 8px;">
-                <span class="key-badge active">Khóa Đang Hoạt Động</span>
-                <p><strong>Mã định danh khóa (Key ID):</strong> <%= userKeys.getActivePublicKeyId() %></p>
-                <p><strong>Khóa Công Khai (Public Key PEM):</strong></p>
+                <span class="key-badge active"><fmt:message key="key.active_badge" /></span>
+                <p><strong><fmt:message key="key.id" /></strong> <%= userKeys.getActivePublicKeyId() %></p>
+                <p><strong><fmt:message key="key.public_pem" /></strong></p>
                 <div class="key-box"><%= userKeys.getActivePublicKey() %></div>
                 <p style="font-size: 13px; color: #6c757d; margin-top: 5px;">
-                    * Lưu ý: Khóa bí mật (Private Key) đã được tải về máy của bạn khi khởi tạo và không lưu trữ trên máy chủ của chúng tôi. Hãy cất giữ nó cẩn thận để ký đơn hàng.
+                    <fmt:message key="key.notice" />
                 </p>
             </div>
 
             <div class="revoke-section">
                 <h3 style="display: flex; align-items: center; gap: 8px; color: var(--error-text);">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    Báo Mất Khóa / Lộ Khóa
+                    <fmt:message key="key.revoke_title" />
                 </h3>
                 <p style="font-size: 14px; margin-bottom: 15px;">
-                    Nếu bạn nghi ngờ khóa bí mật (Private Key) đã bị lộ hoặc bị mất, vui lòng báo mất ngay lập tức. Hệ thống sẽ vô hiệu hóa khóa này từ thời điểm bạn chọn và tự động tạo khóa mới cho bạn.
+                    <fmt:message key="key.revoke_desc" />
                 </p>
                 <form action="${pageContext.request.contextPath}/customer/keys" method="post" class="form-inline" onsubmit="return validateKeyForm(this);">
                     <input type="hidden" name="action" value="revoke">
                     <div style="margin-bottom: 15px;">
-                        <label for="revokeTime" style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 5px;">Thời gian lộ khóa (Nếu để trống sẽ mặc định là hiện tại):</label>
+                        <label for="revokeTime" style="font-weight: 500; font-size: 14px; display: block; margin-bottom: 5px;"><fmt:message key="key.revoke_time" /></label>
                         <input type="datetime-local" id="revokeTime" name="revokeTime" class="form-control" style="padding: 8px; width: 100%; max-width: 300px; border: 1px solid #ced4da; border-radius: 4px;">
                     </div>
                     <div style="margin: 15px 0; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left;">
-                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary);">Tùy chọn nhận Khóa Bí Mật (Private Key) mới:</p>
+                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary);"><fmt:message key="key.receive_options" /></p>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
                                 <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Tải file .pem trực tiếp về máy
+                                <fmt:message key="key.option_download" />
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
                                 <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Gửi qua email đã đăng ký (<%= userKeys.getEmail() %>)
+                                <fmt:message key="key.option_email"><fmt:param value="<%= userKeys.getEmail() %>" /></fmt:message>
                             </label>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545;" onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa khóa này không? Khóa mới sẽ được gửi theo phương thức đã chọn.');">
-                        Báo mất & Tạo khóa mới
+                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545;" onclick="return confirm('<fmt:message key="key.confirm_revoke" />');">
+                        <fmt:message key="key.btn_revoke" />
                     </button>
                 </form>
             </div>
@@ -191,26 +192,26 @@
             } else {
         %>
             <div class="empty-state" style="text-align: center; padding: 2rem 0;">
-                <h2>Bạn chưa tạo khóa chữ ký</h2>
+                <h2><fmt:message key="key.empty_title" /></h2>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    Để đặt hàng, bạn cần tạo một cặp khóa. Khóa công khai sẽ lưu trên web và khóa bí mật sẽ do bạn tự quản lý để ký giao dịch.
+                    <fmt:message key="key.empty_desc" />
                 </p>
                 <form action="${pageContext.request.contextPath}/customer/keys" method="post" onsubmit="return validateKeyForm(this);">
                     <input type="hidden" name="action" value="generate">
                     <div style="margin: 15px auto 20px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left; max-width: 400px;">
-                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary); text-align: center;">Tùy chọn nhận Khóa Bí Mật (Private Key):</p>
+                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary); text-align: center;"><fmt:message key="key.receive_options_new" /></p>
                         <div style="display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin: 0 auto;">
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
                                 <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Tải file .pem trực tiếp về máy
+                                <fmt:message key="key.option_download" />
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
                                 <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                Gửi qua email đã đăng ký (<%= userKeys != null ? userKeys.getEmail() : "" %>)
+                                <fmt:message key="key.option_email"><fmt:param value="<%= userKeys != null ? userKeys.getEmail() : \"\" %>" /></fmt:message>
                             </label>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Tạo cặp khóa mới</button>
+                    <button type="submit" class="btn btn-primary"><fmt:message key="key.btn_generate" /></button>
                 </form>
             </div>
         <%
@@ -220,14 +221,14 @@
         <%
             if (userKeys != null && userKeys.getKeyHistory() != null && !userKeys.getKeyHistory().isEmpty()) {
         %>
-            <h3 style="margin-top: 3rem;">Lịch sử khóa của bạn</h3>
+            <h3 style="margin-top: 3rem;"><fmt:message key="key.history_title" /></h3>
             <table class="key-history-table">
                 <thead>
                     <tr>
                         <th>Key ID</th>
-                        <th>Ngày tạo</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày thu hồi</th>
+                        <th><fmt:message key="key.history.date" /></th>
+                        <th><fmt:message key="key.history.status" /></th>
+                        <th><fmt:message key="key.history.revoked_date" /></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -239,7 +240,7 @@
                             <td><%= new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(record.getCreatedAt()) %></td>
                             <td>
                                 <span class="key-badge <%= isRevoked ? "revoked" : "active" %>">
-                                    <%= isRevoked ? "Bị thu hồi" : "Hoạt động" %>
+                                    <fmt:message key="<%= isRevoked ? \"key.status.revoked\" : \"key.status.active\" %>" />
                                 </span>
                             </td>
                             <td>

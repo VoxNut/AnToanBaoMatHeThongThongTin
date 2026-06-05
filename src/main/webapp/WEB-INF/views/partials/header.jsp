@@ -24,7 +24,6 @@
             <div class="language-selector">
                 <a href="${pageContext.request.contextPath}/language?lang=en" class="${sessionScope.lang == 'en' || sessionScope.lang == null ? 'active' : ''}">EN</a>
                 <a href="${pageContext.request.contextPath}/language?lang=vi" class="${sessionScope.lang == 'vi' ? 'active' : ''}">VI</a>
-                <a href="${pageContext.request.contextPath}/language?lang=ja" class="${sessionScope.lang == 'ja' ? 'active' : ''}">JA</a>
             </div>
             <a href="${pageContext.request.contextPath}/products" title="<fmt:message key="product.search" />">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.beveragestore.model.Order" %>
 <!DOCTYPE html>
@@ -7,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders - Online Beverage Store</title>
+    <title><fmt:message key="order.list.title" /> - The Grindery</title>
     <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +26,7 @@
     <div class="container">
         <h1 style="display:flex; align-items:center; gap:10px;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-            My Orders
+            <fmt:message key="order.list.title" />
         </h1>
     </div>
 </div>
@@ -39,15 +40,17 @@
         <% for (Order order : orders) { %>
         <div class="order-card" onclick="window.location='${pageContext.request.contextPath}/customer/order-detail?id=<%= order.getOrderId() %>'">
             <div class="order-info">
-                <h3>Order #<%= order.getOrderId().substring(0, 8) %>...</h3>
+                <h3><fmt:message key="order.id" /> #<%= order.getOrderId().substring(0, 8) %>...</h3>
                 <div class="order-meta">
-                    <span>Date: <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(order.getCreatedAt()) %></span>
-                    <span><%= order.getTotalItems() %> items</span>
+                    <span><fmt:message key="order.date_placed" />: <%= new java.text.SimpleDateFormat("MMM dd, yyyy").format(order.getCreatedAt()) %></span>
+                    <span><fmt:message key="order.list.item_count"><fmt:param value="<%= order.getTotalItems() %>" /></fmt:message></span>
                 </div>
                 <div class="order-amount"><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></div>
                 <span class="order-status status-<%= order.getStatus().toLowerCase() %>"><%= order.getStatus() %></span>
             </div>
-            <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); window.location='${pageContext.request.contextPath}/customer/order-detail?id=<%= order.getOrderId() %>'">View Details →</button>
+            <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); window.location='${pageContext.request.contextPath}/customer/order-detail?id=<%= order.getOrderId() %>'">
+                <fmt:message key="order.list.view_details" />
+            </button>
         </div>
         <% } %>
     </div>
@@ -56,9 +59,9 @@
         } else {
     %>
     <div class="empty-state">
-        <h2>No Orders Yet</h2>
-        <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">Start shopping to place your first order!</p>
-        <a href="${pageContext.request.contextPath}/products" class="btn btn-primary">Browse Products</a>
+        <h2><fmt:message key="order.list.empty_title" /></h2>
+        <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);"><fmt:message key="order.list.empty_desc" /></p>
+        <a href="${pageContext.request.contextPath}/products" class="btn btn-primary"><fmt:message key="order.list.browse" /></a>
     </div>
     <% } %>
 </div>

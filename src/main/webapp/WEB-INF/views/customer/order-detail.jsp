@@ -1,11 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="com.beveragestore.model.Order" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details - Online Beverage Store</title>
+    <title><fmt:message key="order.id" /> - The Grindery</title>
     <!-- nạp font chữ từ google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +21,7 @@
 <jsp:include page="/WEB-INF/views/partials/header.jsp" />
 
 <div class="container" style="padding-top: var(--spacing-xl);">
-    <a href="${pageContext.request.contextPath}/customer/orders" class="back-link">← Back to Orders</a>
+    <a href="${pageContext.request.contextPath}/customer/orders" class="back-link"><fmt:message key="order.detail.back" /></a>
 
     <%
         Order order = (Order) request.getAttribute("order");
@@ -42,18 +43,18 @@
     <% } %>
 
     <div class="detail-section" style="margin-top: var(--spacing-lg);">
-        <h1 style="margin-bottom: var(--spacing-lg); font-family: var(--font-heading);">Order #<%= order.getOrderId() %></h1>
+        <h1 style="margin-bottom: var(--spacing-lg); font-family: var(--font-heading);"><fmt:message key="order.detail.title"><fmt:param value="<%= order.getOrderId() %>" /></fmt:message></h1>
         <div class="info-grid">
             <div class="info-item">
-                <span class="info-label">Status</span>
+                <span class="info-label"><fmt:message key="order.status" /></span>
                 <span class="order-status status-<%= order.getStatus().toLowerCase() %>"><%= order.getStatus() %></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Order Date</span>
+                <span class="info-label"><fmt:message key="order.date_placed" /></span>
                 <span class="info-value"><%= new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm").format(order.getCreatedAt()) %></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Total Amount</span>
+                <span class="info-label"><fmt:message key="order.total_amount" /></span>
                 <span class="info-value" style="color: var(--accent-primary); font-size: 18px;"><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></span>
             </div>
         </div>
@@ -63,34 +64,34 @@
         <div class="main-column">
             <!-- tiến trình trạng thái đơn hàng -->
             <div class="detail-section">
-                <h2>Order Timeline</h2>
+                <h2><fmt:message key="order.detail.timeline" /></h2>
                 <div class="timeline">
                     <div class="timeline-item completed">
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
-                            <h4>Order Placed</h4>
+                            <h4><fmt:message key="order.detail.placed" /></h4>
                             <p><%= new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm").format(order.getCreatedAt()) %></p>
                         </div>
                     </div>
                     <div class="timeline-item <%= order.getStatus().equals("PROCESSING") || order.getStatus().equals("SHIPPED") || order.getStatus().equals("DELIVERED") ? "completed" : "" %>">
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
-                            <h4>Processing</h4>
-                            <p>We're preparing your order</p>
+                            <h4><fmt:message key="order.detail.processing" /></h4>
+                            <p><fmt:message key="order.detail.processing_desc" /></p>
                         </div>
                     </div>
                     <div class="timeline-item <%= order.getStatus().equals("SHIPPED") || order.getStatus().equals("DELIVERED") ? "completed" : "" %>">
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
-                            <h4>Shipped</h4>
-                            <p>Your package is on the way</p>
+                            <h4><fmt:message key="order.detail.shipped" /></h4>
+                            <p><fmt:message key="order.detail.shipped_desc" /></p>
                         </div>
                     </div>
                     <div class="timeline-item <%= order.getStatus().equals("DELIVERED") ? "completed" : "" %>">
                         <div class="timeline-dot"></div>
                         <div class="timeline-content">
-                            <h4>Delivered</h4>
-                            <p>Order delivered</p>
+                            <h4><fmt:message key="order.detail.delivered" /></h4>
+                            <p><fmt:message key="order.detail.delivered_desc" /></p>
                         </div>
                     </div>
                 </div>
@@ -98,15 +99,15 @@
 
             <!-- các món hàng trong đơn -->
             <div class="detail-section">
-                <h2>Items Ordered</h2>
+                <h2><fmt:message key="order.items_ordered" /></h2>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Product</th>
-                                <th>Unit Price</th>
-                                <th>Quantity</th>
-                                <th>Subtotal</th>
+                                <th><fmt:message key="order.detail.product" /></th>
+                                <th><fmt:message key="order.detail.unit_price" /></th>
+                                <th><fmt:message key="order.detail.quantity" /></th>
+                                <th><fmt:message key="order.detail.subtotal" /></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -127,32 +128,32 @@
         <div class="side-column">
             <!-- tóm tắt đơn hàng -->
             <div class="checkout-summary">
-                <h3>Order Summary</h3>
+                <h3><fmt:message key="cart.order_summary" /></h3>
                 <div class="summary-row">
-                    <span>Subtotal:</span>
+                    <span><fmt:message key="order.detail.subtotal" />:</span>
                     <span><%= String.format("%,.0f VNĐ", order.getTotalAmount()) %></span>
                 </div>
                 <div class="summary-row">
-                    <span>Shipping:</span>
-                    <span>Free</span>
+                    <span><fmt:message key="order.detail.shipping" />:</span>
+                    <span><fmt:message key="checkout.free" /></span>
                 </div>
                 <div class="summary-row">
-                    <span>Tax (8%):</span>
+                    <span><fmt:message key="order.detail.tax" />:</span>
                     <span><%= String.format("%,.0f VNĐ", (order.getTotalAmount() * 0.08)) %></span>
                 </div>
                 <div class="summary-total">
-                    <span>Total Paid:</span>
+                    <span><fmt:message key="order.detail.total_paid" />:</span>
                     <span><%= String.format("%,.0f VNĐ", (order.getTotalAmount() * 1.08)) %></span>
                 </div>
 
                 <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
-                    <h3 style="margin-bottom: var(--spacing-sm); font-size: 14px;">Shipping Address</h3>
+                    <h3 style="margin-bottom: var(--spacing-sm); font-size: 14px;"><fmt:message key="order.detail.shipping_address" /></h3>
                     <p style="white-space: pre-wrap; color: var(--text-secondary); font-size: 13px;"><%= order.getShippingAddress() %></p>
                 </div>
 
                 <% if (order.getNotes() != null && !order.getNotes().isEmpty()) { %>
                 <div style="margin-top: var(--spacing-md);">
-                    <h3 style="margin-bottom: var(--spacing-sm); font-size: 14px;">Delivery Notes</h3>
+                    <h3 style="margin-bottom: var(--spacing-sm); font-size: 14px;"><fmt:message key="order.detail.delivery_notes" /></h3>
                     <p style="color: var(--text-secondary); font-size: 13px;"><%= order.getNotes() %></p>
                 </div>
                 <% } %>
@@ -163,13 +164,13 @@
                         <input type="hidden" name="action" value="cancel" />
                         <input type="hidden" name="id" value="<%= order.getOrderId() %>" />
                         <button type="submit" class="btn btn-danger" style="width: 100%;">
-                            Hủy đơn hàng
+                            <fmt:message key="order.detail.cancel_btn" />
                         </button>
                     </form>
                 </div>
                 <script>
                     function confirmCancel() {
-                        return confirm("Bạn có chắc chắn muốn hủy đơn hàng này? Số lượng sản phẩm sẽ được tự động hoàn lại vào kho.");
+                        return confirm('<fmt:message key="order.detail.cancel_confirm" />');
                     }
                 </script>
                 <% } %>
@@ -179,8 +180,8 @@
 
     <% } else { %>
     <div class="empty-state">
-        <h2>Order Not Found</h2>
-        <a href="${pageContext.request.contextPath}/customer/orders" class="btn btn-primary" style="margin-top: var(--spacing-md);">Back to Orders</a>
+        <h2><fmt:message key="order.not_found" /></h2>
+        <a href="${pageContext.request.contextPath}/customer/orders" class="btn btn-primary" style="margin-top: var(--spacing-md);"><fmt:message key="order.view_orders" /></a>
     </div>
     <% } %>
 </div>

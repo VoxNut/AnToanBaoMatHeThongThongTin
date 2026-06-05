@@ -55,10 +55,10 @@
                 <div class="form-group" style="margin-top: 20px; padding: 15px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius);">
                     <label for="privateKey" class="form-label" style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; margin-bottom: 5px;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary); margin-right: 8px;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-                        Ký số đơn hàng (Private Key PEM):
+                        <fmt:message key="checkout.sign_order" />
                     </label>
                     <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                        Tải lên file Private Key (`.pem`) hoặc dán nội dung vào ô bên dưới. Khóa này chỉ dùng để ký trong phiên giao dịch hiện tại và sẽ không được lưu trên web.
+                        <fmt:message key="checkout.sign_instructions" />
                     </p>
                     <div style="margin-bottom: 10px;">
                         <input type="file" id="privateKeyFile" accept=".pem" class="form-control" style="font-size: 13px; padding: 5px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary);">
