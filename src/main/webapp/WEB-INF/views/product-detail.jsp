@@ -61,7 +61,7 @@
                         <span class="spec-label"><fmt:message key="product.detail.availability" /></span>
                         <span class="spec-value">
                             <% if (product.getStock() > 10) { %>
-                                <span style="color: var(--success-text);"><fmt:message key="product.in_stock" /></span>
+                                <span style="color: var(--success-text);"><fmt:message key="product.in_stock" /> (<%= product.getStock() %>)</span>
                             <% } else if (product.getStock() > 0) { %>
                                 <span style="color: var(--error-text);"><fmt:message key="product.detail.only_left"><fmt:param value="<%= product.getStock() %>" /></fmt:message></span>
                             <% } else { %>

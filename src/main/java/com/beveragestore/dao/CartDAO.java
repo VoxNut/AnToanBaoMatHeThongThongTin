@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beveragestore.model.CartItem;
+import com.beveragestore.model.Product;
 import com.beveragestore.util.FirebaseInitializer;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -54,8 +55,22 @@ public class CartDAO {
                 .get();
 
         List<CartItem> items = new ArrayList<>();
+        ProductDAO productDAO = new ProductDAO();
         for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-            items.add(doc.toObject(CartItem.class));
+            CartItem item = doc.toObject(CartItem.class);
+            if (item != null) {
+                try {
+                    Product product = productDAO.getProductById(item.getProductId());
+                    if (product != null) {
+                        item.setPrice(product.getPrice());
+                        item.setName(product.getName());
+                        item.setImageUrl(product.getImageUrl());
+                    }
+                } catch (Exception e) {
+                    logger.error("Error updating price for product in cart: " + item.getProductId(), e);
+                }
+                items.add(item);
+            }
         }
 
         logger.debug("Retrieved {} items from cart for user: {}", items.size(), userId);
@@ -74,7 +89,21 @@ public class CartDAO {
                 .get();
 
         if (doc.exists()) {
-            return doc.toObject(CartItem.class);
+            CartItem item = doc.toObject(CartItem.class);
+            if (item != null) {
+                try {
+                    ProductDAO productDAO = new ProductDAO();
+                    Product product = productDAO.getProductById(productId);
+                    if (product != null) {
+                        item.setPrice(product.getPrice());
+                        item.setName(product.getName());
+                        item.setImageUrl(product.getImageUrl());
+                    }
+                } catch (Exception e) {
+                    logger.error("Error updating price for product in cart: " + productId, e);
+                }
+            }
+            return item;
         }
 
         return null;

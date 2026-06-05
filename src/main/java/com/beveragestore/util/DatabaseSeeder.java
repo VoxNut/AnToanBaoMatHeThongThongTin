@@ -35,6 +35,7 @@ public class DatabaseSeeder {
 
             // 0. Chuyển đổi dữ liệu từ USD sang VND nếu có sẵn
             migrateDollarToVnd(productDAO, orderDAO);
+            migrateCartsToVnd(db);
 
             // 1. nạp dữ liệu mẫu cho user
             logger.info("Seeding Users...");
@@ -381,6 +382,35 @@ public class DatabaseSeeder {
             if (updated) {
                 orderDAO.updateOrder(o);
                 logger.info("Migrated Order: {} totalAmount -> {} VNĐ", o.getOrderId(), o.getTotalAmount());
+            }
+        }
+    }
+
+    private static void migrateCartsToVnd(Firestore db) throws Exception {
+        logger.info("Checking for cart items currency migration to VND...");
+        com.google.api.core.ApiFuture<com.google.cloud.firestore.QuerySnapshot> future = db.collection("cart").get();
+        com.google.cloud.firestore.QuerySnapshot carts = future.get();
+        for (com.google.cloud.firestore.DocumentSnapshot cartDoc : carts.getDocuments()) {
+            String userId = cartDoc.getId();
+            com.google.api.core.ApiFuture<com.google.cloud.firestore.QuerySnapshot> itemsFuture = db.collection("cart")
+                    .document(userId)
+                    .collection("items")
+                    .get();
+            com.google.cloud.firestore.QuerySnapshot items = itemsFuture.get();
+            for (com.google.cloud.firestore.DocumentSnapshot itemDoc : items.getDocuments()) {
+                com.beveragestore.model.CartItem item = itemDoc.toObject(com.beveragestore.model.CartItem.class);
+                if (item != null && item.getPrice() < 1000.0) {
+                    double oldPrice = item.getPrice();
+                    double newPrice = oldPrice * 25000.0;
+                    item.setPrice(newPrice);
+                    db.collection("cart")
+                            .document(userId)
+                            .collection("items")
+                            .document(item.getProductId())
+                            .set(item)
+                            .get();
+                    logger.info("Migrated Cart Item for user {}: {} ({} -> {} VNĐ)", userId, item.getName(), oldPrice, newPrice);
+                }
             }
         }
     }

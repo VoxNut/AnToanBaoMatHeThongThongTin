@@ -78,10 +78,10 @@
                                 <div class="product-stock">
                                     <c:choose>
                                         <c:when test="${product.stock > 10}">
-                                            <span class="stock-available"><fmt:message key="product.in_stock" /></span>
+                                            <span class="stock-available"><fmt:message key="product.in_stock" /> (${product.stock})</span>
                                         </c:when>
                                         <c:when test="${product.stock > 0}">
-                                            <span class="stock-low"><fmt:message key="product.low_stock" /></span>
+                                            <span class="stock-low"><fmt:message key="product.low_stock" /> (${product.stock})</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="stock-low"><fmt:message key="product.out_of_stock" /></span>
