@@ -131,6 +131,23 @@
 
 <div class="container">
     <div class="key-container">
+        <!-- Offline Tool Download Box -->
+        <div style="margin-bottom: 2rem; padding: 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <div style="flex: 1 1 400px;">
+                <h3 style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                    <fmt:message key="key.offline_tool_title" />
+                </h3>
+                <p style="margin: 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.4;">
+                    <fmt:message key="key.offline_tool_desc" />
+                </p>
+            </div>
+            <a href="${pageContext.request.contextPath}/downloads/SignatureTool.exe" class="btn btn-primary" style="font-size: 13.5px; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;" download>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Tải Tool (.EXE)
+            </a>
+        </div>
+
         <c:if test="${not empty error}">
             <div class="alert alert-danger" style="margin-bottom: 20px; padding: 10px; background: #f8d7da; color: #721c24; border-radius: 4px;">
                 ${error}

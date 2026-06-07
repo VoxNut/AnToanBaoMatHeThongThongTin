@@ -70,14 +70,6 @@
                         <fmt:message key="checkout.sign_order" />
                     </label>
 
-                    <!-- Offline Tool Download Link -->
-                    <div style="margin-bottom: 15px;">
-                        <a href="${pageContext.request.contextPath}/downloads/SignatureTool.exe" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;" download>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            <fmt:message key="checkout.offline_tool_link" />
-                        </a>
-                    </div>
-
                     <!-- Method Selection -->
                     <div style="margin-bottom: 15px;">
                         <span class="form-label" style="font-size: 12px; display: block; margin-bottom: 6px;"><fmt:message key="checkout.signing_method" /></span>

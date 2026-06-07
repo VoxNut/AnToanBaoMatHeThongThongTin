@@ -131,15 +131,8 @@
                         <input type="hidden" name="id" value="<%= order.getOrderId() %>" />
                         <input type="hidden" id="signMethod" name="signMethod" value="online" />
 
-                        <!-- Download Link and Tabs -->
+                        <!-- Tabs Selection -->
                         <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
-                            <div>
-                                <a href="${pageContext.request.contextPath}/downloads/SignatureTool.exe" class="btn btn-secondary" style="font-size: 13px; padding: 8px 16px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;" download>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                    <fmt:message key="checkout.offline_tool_link" />
-                                </a>
-                            </div>
-                            
                             <div>
                                 <span class="form-label" style="font-size: 13px; display: block; margin-bottom: 8px; font-weight: 500;"><fmt:message key="checkout.signing_method" /></span>
                                 <div style="display: flex; gap: 10px;">

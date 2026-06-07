@@ -387,33 +387,33 @@ class SignatureTool(QMainWindow):
             QMessageBox.critical(self, "Lỗi", f"Lỗi xác thực: {str(e)}")
 
     def apply_style(self):
-        # Premium dark mode stylesheet
+        # Premium sepia stylesheet
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #0f172a;
+                background-color: #f4ecd8;
             }
             #headerLabel {
-                color: #e2e8f0;
+                color: #433422;
                 font-family: 'Inter', 'Segoe UI', Arial;
                 font-size: 20px;
                 font-weight: bold;
                 margin-top: 10px;
             }
             #subtitleLabel {
-                color: #94a3b8;
+                color: #705d49;
                 font-family: 'Inter', 'Segoe UI', Arial;
                 font-size: 13px;
                 margin-bottom: 10px;
             }
             QTabWidget::pane {
-                border: 1px solid #1e293b;
-                background: #1e293b;
+                border: 1px solid #d3c2ad;
+                background: #e8dfc7;
                 border-radius: 8px;
             }
             QTabBar::tab {
-                background: #0f172a;
-                color: #64748b;
-                border: 1px solid #1e293b;
+                background: #f4ecd8;
+                color: #705d49;
+                border: 1px solid #d3c2ad;
                 border-bottom: none;
                 padding: 10px 20px;
                 font-family: 'Inter', 'Segoe UI', Arial;
@@ -423,64 +423,64 @@ class SignatureTool(QMainWindow):
                 border-top-right-radius: 6px;
             }
             QTabBar::tab:selected {
-                background: #1e293b;
-                color: #38bdf8;
-                border-color: #1e293b;
+                background: #e8dfc7;
+                color: #8b4513;
+                border-color: #d3c2ad;
             }
             #infoLabel {
-                color: #cbd5e1;
+                color: #433422;
                 font-family: 'Inter', 'Segoe UI', Arial;
                 font-size: 13px;
                 line-height: 1.4;
             }
             #fieldLabel {
-                color: #f1f5f9;
+                color: #433422;
                 font-family: 'Inter', 'Segoe UI', Arial;
                 font-size: 13px;
                 font-weight: 600;
             }
             QTextEdit {
-                background-color: #0f172a;
-                color: #e2e8f0;
-                border: 1px solid #334155;
+                background-color: #fcf9f2;
+                color: #433422;
+                border: 1px solid #c3b091;
                 border-radius: 6px;
                 padding: 8px;
             }
             QTextEdit:focus {
-                border: 1px solid #38bdf8;
+                border: 1px solid #8b4513;
             }
             QPushButton {
-                background-color: #0f172a;
-                color: #e2e8f0;
-                border: 1px solid #334155;
+                background-color: #efe6cf;
+                color: #433422;
+                border: 1px solid #c3b091;
                 border-radius: 6px;
                 padding: 8px 16px;
                 font-family: 'Inter', 'Segoe UI', Arial;
                 font-weight: 500;
             }
             QPushButton:hover {
-                background-color: #1e293b;
-                border-color: #475569;
+                background-color: #e2d8bd;
+                border-color: #bfa88c;
             }
             #primaryButton {
-                background-color: #0284c7;
+                background-color: #8b4513;
                 color: #ffffff;
                 border: none;
                 font-weight: bold;
             }
             #primaryButton:hover {
-                background-color: #0369a1;
+                background-color: #70380f;
             }
             #secondaryButton {
-                background-color: #334155;
-                color: #f1f5f9;
+                background-color: #c3b091;
+                color: #433422;
                 border: none;
             }
             #secondaryButton:hover {
-                background-color: #475569;
+                background-color: #bfa88c;
             }
             QRadioButton {
-                color: #cbd5e1;
+                color: #433422;
                 font-family: 'Inter', 'Segoe UI', Arial;
                 font-size: 12px;
             }
