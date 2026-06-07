@@ -14,6 +14,164 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css?v=1.0">
+    <style>
+        .filter-bar {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 24px;
+            margin-bottom: var(--spacing-xl);
+        }
+        .filter-form {
+            width: 100%;
+        }
+        .filter-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        .filter-item {
+            flex: 1 1 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+        .filter-input, .filter-select {
+            height: 40px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 100%;
+            background-color: var(--bg-white);
+            color: var(--text-primary);
+            font-size: 13.5px;
+        }
+        .filter-select {
+            cursor: pointer;
+        }
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-filter, .btn-clear {
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            font-size: 13.5px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        .btn-clear {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .btn-clear:hover {
+            background: var(--bg-secondary);
+        }
+        
+        /* Table Styling Improvements */
+        .table-container {
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        th {
+            padding: 16px 20px;
+            background: #f8f9fa;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        td {
+            padding: 18px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background-color: #fafbfc;
+        }
+        
+        /* Status Select Badges */
+        .status-select {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 6px 24px 6px 12px;
+            border-radius: 30px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 12px;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='currentColor' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+        }
+        .status-select.status-DELIVERED {
+            background-color: #e6f6ec;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+        .status-select.status-CANCELLED {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+        .status-select.status-PENDING {
+            background-color: #fff7ed;
+            color: #c2410c;
+            border-color: #ffedd5;
+        }
+        .status-select.status-PROCESSING {
+            background-color: #f0f9ff;
+            color: #0369a1;
+            border-color: #e0f2fe;
+        }
+        .status-select.status-SHIPPED {
+            background-color: #faf5ff;
+            color: #6b21a8;
+            border-color: #f3e8ff;
+        }
+
+        /* Toast Popup */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #27272a;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            z-index: 10000;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #3f3f46;
+        }
+    </style>
 </head>
 <body>
 
@@ -46,6 +204,45 @@
 
         <h2 style="font-family: var(--font-body); margin-bottom: var(--spacing-lg);">All Orders</h2>
 
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <form method="GET" action="${pageContext.request.contextPath}/admin/orders" class="filter-form">
+                <div class="filter-fields">
+                    <div class="filter-item">
+                        <label for="searchId" class="filter-label">Order ID</label>
+                        <input type="text" id="searchId" name="searchId" value="<%= request.getAttribute("searchId") != null ? request.getAttribute("searchId") : "" %>" placeholder="Search by Order ID..." class="filter-input">
+                    </div>
+                    <div class="filter-item">
+                        <label for="statusFilter" class="filter-label">Order Status</label>
+                        <select id="statusFilter" name="statusFilter" class="filter-select">
+                            <% String statusVal = (String) request.getAttribute("statusFilter"); %>
+                            <option value="ALL" <%= "ALL".equals(statusVal) || statusVal == null || statusVal.isEmpty() ? "selected" : "" %>>All Statuses</option>
+                            <option value="PENDING" <%= "PENDING".equals(statusVal) ? "selected" : "" %>>Pending</option>
+                            <option value="PROCESSING" <%= "PROCESSING".equals(statusVal) ? "selected" : "" %>>Processing</option>
+                            <option value="SHIPPED" <%= "SHIPPED".equals(statusVal) ? "selected" : "" %>>Shipped</option>
+                            <option value="DELIVERED" <%= "DELIVERED".equals(statusVal) ? "selected" : "" %>>Delivered</option>
+                            <option value="CANCELLED" <%= "CANCELLED".equals(statusVal) ? "selected" : "" %>>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="sigFilter" class="filter-label">Signature Status</label>
+                        <select id="sigFilter" name="sigFilter" class="filter-select">
+                            <% String sigVal = (String) request.getAttribute("sigFilter"); %>
+                            <option value="ALL" <%= "ALL".equals(sigVal) || sigVal == null || sigVal.isEmpty() ? "selected" : "" %>>All Signatures</option>
+                            <option value="VALID" <%= "VALID".equals(sigVal) ? "selected" : "" %>>Valid (Hợp lệ)</option>
+                            <option value="INVALID" <%= "INVALID".equals(sigVal) ? "selected" : "" %>>Invalid (Đã bị sửa đổi)</option>
+                            <option value="REVOKED_KEY" <%= "REVOKED_KEY".equals(sigVal) ? "selected" : "" %>>Revoked Key (Khóa báo mất)</option>
+                            <option value="UNSIGNED" <%= "UNSIGNED".equals(sigVal) ? "selected" : "" %>>Unsigned / Missing (Chưa ký/Lỗi)</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary btn-filter">Filter</button>
+                        <a href="${pageContext.request.contextPath}/admin/orders" class="btn btn-secondary btn-clear">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <div class="table-container">
             <table>
                 <thead>
@@ -55,7 +252,6 @@
                         <th>Total</th>
                         <th>Chữ ký</th>
                         <th>Status</th>
-                        <th>Update Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,9 +288,14 @@
                     %>
                     <tr>
                         <td>
-                            <span style="font-family: monospace; color: var(--text-secondary);" title="<%= o.getOrderId() %>">
-                                <%= o.getOrderId().substring(0, 8) %>...
-                            </span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span style="font-family: monospace; color: var(--text-secondary);" title="<%= o.getOrderId() %>">
+                                    <%= o.getOrderId().substring(0, 8) %>...
+                                </span>
+                                <button onclick="copyToClipboard('<%= o.getOrderId() %>')" style="background: none; border: none; padding: 2px; cursor: pointer; color: var(--text-light); display: inline-flex; align-items: center;" title="Sao chép ID đầy đủ">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </td>
                         <td><%= new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm:ss").format(o.getCreatedAt()) %></td>
                         <td style="font-weight: 500;"><%= String.format("%,.0f VNĐ", o.getTotalAmount()) %></td>
@@ -105,27 +306,23 @@
                             </span>
                         </td>
                         <td>
-                            <span class="status-badge status-<%= o.getStatus() %>"><%= o.getStatus() %></span>
-                        </td>
-                        <td>
-                            <form method="POST" action="${pageContext.request.contextPath}/admin/orders" class="action-form">
+                            <form method="POST" action="${pageContext.request.contextPath}/admin/orders" class="action-form" style="margin: 0;">
                                 <input type="hidden" name="action" value="update_status">
                                 <input type="hidden" name="orderId" value="<%= o.getOrderId() %>">
-                                <select name="status" class="form-control">
+                                <select name="status" class="status-select status-<%= o.getStatus() %>" onchange="this.form.submit();">
                                     <option value="PENDING" <%= "PENDING".equals(o.getStatus()) ? "selected" : "" %>>Pending</option>
                                     <option value="PROCESSING" <%= "PROCESSING".equals(o.getStatus()) ? "selected" : "" %>>Processing</option>
                                     <option value="SHIPPED" <%= "SHIPPED".equals(o.getStatus()) ? "selected" : "" %>>Shipped</option>
                                     <option value="DELIVERED" <%= "DELIVERED".equals(o.getStatus()) ? "selected" : "" %>>Delivered</option>
                                     <option value="CANCELLED" <%= "CANCELLED".equals(o.getStatus()) ? "selected" : "" %>>Cancelled</option>
                                 </select>
-                                <button type="submit" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Update</button>
                             </form>
                         </td>
                     </tr>
                     <%      }
                        } else { %>
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px;">No orders found.</td>
+                        <td colspan="5" style="text-align: center; padding: 40px;">No orders found.</td>
                     </tr>
 
                     <% } %>
@@ -134,6 +331,28 @@
         </div>
     </div>
 </div>
+
+<!-- Toast Popup -->
+<div id="toast-msg" class="toast-container"></div>
+
+<script>
+function showToast(message) {
+    var toast = document.getElementById("toast-msg");
+    toast.innerText = message;
+    toast.style.display = "block";
+    setTimeout(function() {
+        toast.style.display = "none";
+    }, 2500);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        showToast('Copied Order ID: ' + text.substring(0, 8) + '...');
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+</script>
 
 <jsp:include page="/WEB-INF/views/partials/footer.jsp" />
 </body>

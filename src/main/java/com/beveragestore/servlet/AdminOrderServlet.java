@@ -90,8 +90,65 @@ public class AdminOrderServlet extends HttpServlet {
                     order.setSignatureStatus("ERROR");
                 }
             }
+
+            // 1. Lấy các tham số lọc từ request
+            String statusFilter = request.getParameter("statusFilter");
+            String sigFilter = request.getParameter("sigFilter");
+            String searchId = request.getParameter("searchId");
+
+            if (statusFilter == null) statusFilter = "";
+            if (sigFilter == null) sigFilter = "";
+            if (searchId == null) searchId = "";
+
+            statusFilter = statusFilter.trim();
+            sigFilter = sigFilter.trim();
+            searchId = searchId.trim();
+
+            // 2. Lọc in-memory
+            List<Order> filteredOrders = new java.util.ArrayList<>();
+            for (Order order : orders) {
+                boolean match = true;
+
+                // Lọc theo status
+                if (!statusFilter.isEmpty() && !"ALL".equalsIgnoreCase(statusFilter)) {
+                    if (!statusFilter.equalsIgnoreCase(order.getStatus())) {
+                        match = false;
+                    }
+                }
+
+                // Lọc theo chữ ký
+                if (match && !sigFilter.isEmpty() && !"ALL".equalsIgnoreCase(sigFilter)) {
+                    String status = order.getSignatureStatus();
+                    if ("UNSIGNED".equalsIgnoreCase(sigFilter)) {
+                        if (status != null && !"UNSIGNED".equalsIgnoreCase(status) 
+                                && !"NO_KEY_FOUND".equalsIgnoreCase(status) 
+                                && !"NO_USER".equalsIgnoreCase(status) 
+                                && !"ERROR".equalsIgnoreCase(status)) {
+                            match = false;
+                        }
+                    } else {
+                        if (status == null || !sigFilter.equalsIgnoreCase(status)) {
+                            match = false;
+                        }
+                    }
+                }
+
+                // Lọc theo searchId
+                if (match && !searchId.isEmpty()) {
+                    if (order.getOrderId() == null || !order.getOrderId().toLowerCase().contains(searchId.toLowerCase())) {
+                        match = false;
+                    }
+                }
+
+                if (match) {
+                    filteredOrders.add(order);
+                }
+            }
             
-            request.setAttribute("orders", orders);
+            request.setAttribute("orders", filteredOrders);
+            request.setAttribute("statusFilter", statusFilter);
+            request.setAttribute("sigFilter", sigFilter);
+            request.setAttribute("searchId", searchId);
             request.getRequestDispatcher("/WEB-INF/views/admin/orders.jsp").forward(request, response);
 
         } catch (Exception e) {
