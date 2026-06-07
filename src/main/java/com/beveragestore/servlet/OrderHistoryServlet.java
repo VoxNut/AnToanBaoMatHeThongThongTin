@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import com.beveragestore.dao.OrderDAO;
 import com.beveragestore.model.Order;
+import com.beveragestore.model.User;
+import com.beveragestore.dao.UserDAO;
 import com.beveragestore.util.SessionUtil;
+
 
 /**
  * servlet hiển thị lịch sử đơn hàng của khách.
@@ -42,8 +45,17 @@ public class OrderHistoryServlet extends HttpServlet {
 
             List<Order> orders = orderDAO.getOrdersByUserId(userId);
 
+            UserDAO userDAO = new UserDAO();
+            User buyer = userDAO.findByUid(userId);
+            if (buyer != null) {
+                for (Order order : orders) {
+                    com.beveragestore.util.CryptoUtil.verifyOrderSignature(order, buyer);
+                }
+            }
+
             request.setAttribute("orders", orders);
             request.getRequestDispatcher("/WEB-INF/views/customer/orders.jsp").forward(request, response);
+
 
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error retrieving order history", e);

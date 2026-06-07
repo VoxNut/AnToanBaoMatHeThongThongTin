@@ -19,6 +19,9 @@ import com.beveragestore.util.FirebaseInitializer;
 import com.beveragestore.util.SessionUtil;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.beveragestore.model.User;
+import com.beveragestore.dao.UserDAO;
+
 
 /**
  * servlet xem chi tiết đơn hàng.
@@ -71,8 +74,15 @@ public class OrderDetailServlet extends HttpServlet {
                 request.getSession().removeAttribute("error");
             }
 
+            UserDAO userDAO = new UserDAO();
+            User buyer = userDAO.findByUid(userId);
+            if (buyer != null) {
+                com.beveragestore.util.CryptoUtil.verifyOrderSignature(order, buyer);
+            }
+
             request.setAttribute("order", order);
             request.getRequestDispatcher("/WEB-INF/views/customer/order-detail.jsp").forward(request, response);
+
 
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error retrieving order details", e);
@@ -93,10 +103,76 @@ public class OrderDetailServlet extends HttpServlet {
         String orderId = request.getParameter("id");
         String action = request.getParameter("action");
 
-        if (orderId == null || orderId.trim().isEmpty() || !"cancel".equals(action)) {
+        if (orderId == null || orderId.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/customer/orders");
             return;
         }
+
+        if ("resign_order".equals(action)) {
+            String privateKeyPem = request.getParameter("privateKey");
+            String offlineSignature = request.getParameter("signature");
+
+            try {
+                Order order = orderDAO.getOrderById(orderId);
+                if (order == null || !order.getUserId().equals(userId)) {
+                    response.sendRedirect(request.getContextPath() + "/customer/orders");
+                    return;
+                }
+
+                UserDAO userDAO = new UserDAO();
+                User buyer = userDAO.findByUid(userId);
+
+                if (buyer == null || buyer.getActivePublicKey() == null) {
+                    request.getSession().setAttribute("error", "Bạn chưa tạo khóa chữ ký. Vui lòng vào trang Quản lý Khóa để tạo trước.");
+                    response.sendRedirect(request.getContextPath() + "/customer/order-detail?id=" + orderId);
+                    return;
+                }
+
+                String hash = com.beveragestore.util.CryptoUtil.calculateOrderHash(order);
+                String signature = "";
+
+                if (privateKeyPem != null && !privateKeyPem.trim().isEmpty()) {
+                    java.security.PrivateKey privateKey = com.beveragestore.util.CryptoUtil.pemToPrivateKey(privateKeyPem);
+                    signature = com.beveragestore.util.CryptoUtil.sign(hash, privateKey);
+                } else if (offlineSignature != null && !offlineSignature.trim().isEmpty()) {
+                    signature = offlineSignature.strip().replace("\r", "").replace("\n", "");
+                } else {
+                    request.getSession().setAttribute("error", "Vui lòng nhập khóa bí mật hoặc chữ ký ngoại tuyến.");
+                    response.sendRedirect(request.getContextPath() + "/customer/order-detail?id=" + orderId);
+                    return;
+                }
+
+                java.security.PublicKey publicKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(buyer.getActivePublicKey());
+                boolean isValid = com.beveragestore.util.CryptoUtil.verify(hash, signature, publicKey);
+
+                if (!isValid) {
+                    request.getSession().setAttribute("error", "Chữ ký không khớp với khóa công khai đã đăng ký trên hệ thống.");
+                    response.sendRedirect(request.getContextPath() + "/customer/order-detail?id=" + orderId);
+                    return;
+                }
+
+                order.setSignature(signature);
+                order.setSignedHash(hash);
+                order.setPublicKeyId(buyer.getActivePublicKeyId());
+                order.setResignRequired(false);
+                order.setResignMessage(null);
+                
+                orderDAO.updateOrder(order);
+
+                request.getSession().setAttribute("success", "Ký lại đơn hàng thành công!");
+            } catch (Exception e) {
+                logger.error("Lỗi ký lại đơn hàng", e);
+                request.getSession().setAttribute("error", "Không thể ký lại đơn hàng: " + e.getMessage());
+            }
+            response.sendRedirect(request.getContextPath() + "/customer/order-detail?id=" + orderId);
+            return;
+        }
+
+        if (!"cancel".equals(action)) {
+            response.sendRedirect(request.getContextPath() + "/customer/orders");
+            return;
+        }
+
 
         try {
             cancelOrderTransaction(userId, orderId);

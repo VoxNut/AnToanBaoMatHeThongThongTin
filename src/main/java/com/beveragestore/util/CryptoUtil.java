@@ -6,6 +6,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import com.beveragestore.model.Order;
+import com.beveragestore.model.User;
+
 
 public class CryptoUtil {
 
@@ -75,20 +77,19 @@ public class CryptoUtil {
         byte[] hashBytes = digest.digest(data.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hashBytes);
     }
-
     // tính mã băm (hash) đặc trưng cho dữ liệu đơn hàng
     public static String calculateOrderHash(Order order) throws NoSuchAlgorithmException {
         StringBuilder sb = new StringBuilder();
         sb.append(order.getOrderId()).append("|");
         sb.append(order.getUserId()).append("|");
-        sb.append(String.format("%.2f", order.getTotalAmount())).append("|");
+        sb.append(String.format(java.util.Locale.US, "%.2f", order.getTotalAmount())).append("|");
         sb.append(order.getShippingAddress() != null ? order.getShippingAddress().trim() : "").append("|");
         
         if (order.getItems() != null) {
             for (Order.OrderItem item : order.getItems()) {
                 sb.append(item.getProductId()).append(":")
                   .append(item.getQuantity()).append(":")
-                  .append(String.format("%.2f", item.getUnitPrice())).append("|");
+                  .append(String.format(java.util.Locale.US, "%.2f", item.getUnitPrice())).append("|");
             }
         }
         return sha256(sb.toString());
@@ -115,4 +116,50 @@ public class CryptoUtil {
             return false;
         }
     }
+
+    // xác thực động trạng thái chữ ký số của đơn hàng từ lịch sử khóa của user
+
+    public static void verifyOrderSignature(Order order, User buyer) {
+        if (order.getSignature() == null) {
+            order.setSignatureStatus("UNSIGNED");
+            return;
+        }
+        if (buyer == null) {
+            order.setSignatureStatus("NO_USER");
+            return;
+        }
+        try {
+            User.PublicKeyRecord keyRecord = null;
+            if (buyer.getKeyHistory() != null) {
+                for (User.PublicKeyRecord rec : buyer.getKeyHistory()) {
+                    if (order.getPublicKeyId() != null && order.getPublicKeyId().equals(rec.getKeyId())) {
+                        keyRecord = rec;
+                        break;
+                    }
+                }
+            }
+
+            if (keyRecord == null) {
+                order.setSignatureStatus("NO_KEY_FOUND");
+            } else {
+                // kiểm tra xem khóa này có bị hủy trước thời điểm đặt hàng không
+                if (keyRecord.getRevokedAt() != null && keyRecord.getRevokedAt().before(order.getCreatedAt())) {
+                    order.setSignatureStatus("REVOKED_KEY");
+                } else {
+                    // kiểm tra xem dữ liệu đơn hàng có bị sửa đổi không
+                    String currentHash = calculateOrderHash(order);
+                    PublicKey pubKey = pemToPublicKey(keyRecord.getPublicKeyPem());
+                    boolean isValid = verify(currentHash, order.getSignature(), pubKey);
+                    if (isValid) {
+                        order.setSignatureStatus("VALID");
+                    } else {
+                        order.setSignatureStatus("INVALID");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            order.setSignatureStatus("ERROR");
+        }
+    }
 }
+

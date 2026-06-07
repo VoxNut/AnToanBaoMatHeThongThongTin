@@ -298,19 +298,35 @@
                          <td><%= new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm:ss").format(o.getCreatedAt()) %></td>
                          <td style="font-weight: 500;"><%= String.format("%,.0f VNĐ", o.getTotalAmount()) %></td>
                          <td>
-                             <span style="display: inline-flex; align-items: center; padding: 4px 8px; border-radius: var(--border-radius); font-size: 11px; font-weight: 600; color: <%= badgeColor %>; background-color: <%= badgeBg %>; border: 1px solid <%= badgeColor %>22;">
-                                 <%= badgeIcon %>
-                                 <% if ("VALID".equals(sigStatus)) { %>
-                                     <fmt:message key="admin.orders.sig.valid" />
-                                 <% } else if ("INVALID".equals(sigStatus)) { %>
-                                     <fmt:message key="admin.orders.sig.invalid" />
-                                 <% } else if ("REVOKED_KEY".equals(sigStatus)) { %>
-                                     <fmt:message key="admin.orders.sig.revoked" />
-                                 <% } else { %>
-                                     <fmt:message key="admin.orders.sig.unsigned" />
-                                 <% } %>
-                             </span>
-                         </td>
+                              <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                                  <span style="display: inline-flex; align-items: center; padding: 4px 8px; border-radius: var(--border-radius); font-size: 11px; font-weight: 600; color: <%= badgeColor %>; background-color: <%= badgeBg %>; border: 1px solid <%= badgeColor %>22;">
+                                      <%= badgeIcon %>
+                                      <% if ("VALID".equals(sigStatus)) { %>
+                                          <fmt:message key="admin.orders.sig.valid" />
+                                      <% } else if ("INVALID".equals(sigStatus)) { %>
+                                          <fmt:message key="admin.orders.sig.invalid" />
+                                      <% } else if ("REVOKED_KEY".equals(sigStatus)) { %>
+                                          <fmt:message key="admin.orders.sig.revoked" />
+                                      <% } else { %>
+                                          <fmt:message key="admin.orders.sig.unsigned" />
+                                      <% } %>
+                                  </span>
+                                  
+                                  <% if (o.isResignRequired()) { %>
+                                      <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a;">
+                                          <fmt:message key="admin.orders.resign_requested" />
+                                      </span>
+                                  <% } else if ("INVALID".equals(sigStatus) && Order.STATUS_PENDING.equals(o.getStatus())) { %>
+                                      <form method="POST" action="${pageContext.request.contextPath}/admin/orders" style="margin: 0;">
+                                          <input type="hidden" name="action" value="request_resign" />
+                                          <input type="hidden" name="orderId" value="<%= o.getOrderId() %>" />
+                                          <button type="submit" class="btn btn-secondary" style="font-size: 10px; padding: 4px 8px; line-height: 1; min-height: auto; border-radius: 4px; cursor: pointer;">
+                                              <fmt:message key="admin.orders.action.request_resign" />
+                                          </button>
+                                      </form>
+                                  <% } %>
+                              </div>
+                          </td>
                          <td>
                              <form method="POST" action="${pageContext.request.contextPath}/admin/orders" class="action-form" style="margin: 0;">
                                  <input type="hidden" name="action" value="update_status">

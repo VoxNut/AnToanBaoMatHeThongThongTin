@@ -73,10 +73,13 @@ public class CheckoutServlet extends HttpServlet {
                 return;
             }
 
+            String orderId = UUID.randomUUID().toString();
+            request.setAttribute("orderId", orderId);
             request.setAttribute("cartItems", cartItems);
             request.setAttribute("cartTotal", cartTotal);
 
             request.getRequestDispatcher("/WEB-INF/views/checkout.jsp").forward(request, response);
+
 
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error loading checkout page", e);
@@ -97,7 +100,10 @@ public class CheckoutServlet extends HttpServlet {
 
             String shippingAddress = request.getParameter("shippingAddress");
             String notes = request.getParameter("notes");
+            String signMethod = request.getParameter("signMethod");
             String privateKeyPem = request.getParameter("privateKey");
+            String offlineSignature = request.getParameter("signature");
+            String orderId = request.getParameter("orderId");
 
             if (shippingAddress == null || shippingAddress.trim().isEmpty()) {
                 request.setAttribute("error", "Shipping address is required");
@@ -105,11 +111,26 @@ public class CheckoutServlet extends HttpServlet {
                 return;
             }
 
-            if (privateKeyPem == null || privateKeyPem.trim().isEmpty()) {
-                request.setAttribute("error", "Private Key is required to sign the order");
+            if (orderId == null || orderId.trim().isEmpty()) {
+                request.setAttribute("error", "Order ID is invalid");
                 doGet(request, response);
                 return;
             }
+
+            if ("offline".equals(signMethod)) {
+                if (offlineSignature == null || offlineSignature.trim().isEmpty()) {
+                    request.setAttribute("error", "Signature is required for offline signing");
+                    doGet(request, response);
+                    return;
+                }
+            } else {
+                if (privateKeyPem == null || privateKeyPem.trim().isEmpty()) {
+                    request.setAttribute("error", "Private Key is required to sign the order");
+                    doGet(request, response);
+                    return;
+                }
+            }
+
 
             // lấy các món trong giỏ hàng
             List<CartItem> cartItems = cartDAO.getCartItems(userId);
@@ -126,7 +147,7 @@ public class CheckoutServlet extends HttpServlet {
             // bước 2: giảm số lượng trong kho của mỗi sản phẩm
             // bước 3: tạo đơn hàng mới có chữ ký số xác thực
             // bước 4: xóa sạch giỏ hàng của user
-            String orderId = UUID.randomUUID().toString();
+
 
             db.runTransaction(transaction -> {
                 // bước 0: lấy thông tin khóa của user
@@ -191,14 +212,20 @@ public class CheckoutServlet extends HttpServlet {
                 // băm dữ liệu mật mã và tạo chữ ký số
                 try {
                     String hash = com.beveragestore.util.CryptoUtil.calculateOrderHash(order);
-                    java.security.PrivateKey privateKey = com.beveragestore.util.CryptoUtil.pemToPrivateKey(privateKeyPem);
-                    String signature = com.beveragestore.util.CryptoUtil.sign(hash, privateKey);
+                    String signature = "";
+
+                    if ("offline".equals(signMethod)) {
+                        signature = offlineSignature.strip().replace("\r", "").replace("\n", "");
+                    } else {
+                        java.security.PrivateKey privateKey = com.beveragestore.util.CryptoUtil.pemToPrivateKey(privateKeyPem);
+                        signature = com.beveragestore.util.CryptoUtil.sign(hash, privateKey);
+                    }
 
                     // xác thực dựa trên public key đang kích hoạt
                     java.security.PublicKey publicKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(dbUser.getActivePublicKey());
                     boolean isValid = com.beveragestore.util.CryptoUtil.verify(hash, signature, publicKey);
                     if (!isValid) {
-                        throw new IllegalArgumentException("Khóa bí mật không khớp với khóa công khai đã đăng ký trên hệ thống.");
+                        throw new IllegalArgumentException("Khóa hoặc chữ ký không khớp với khóa công khai đã đăng ký trên hệ thống.");
                     }
 
                     order.setSignature(signature);
@@ -210,8 +237,9 @@ public class CheckoutServlet extends HttpServlet {
                     throw e;
                 } catch (Exception e) {
                     logger.error("Lỗi ký đơn hàng", e);
-                    throw new IllegalArgumentException("Không thể ký đơn hàng. Vui lòng kiểm tra lại khóa bí mật.");
+                    throw new IllegalArgumentException("Không thể ký đơn hàng. Vui lòng kiểm tra lại khóa hoặc chữ ký.");
                 }
+
 
                 transaction.set(db.collection("orders").document(orderId), order);
 

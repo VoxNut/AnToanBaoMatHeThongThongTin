@@ -45,6 +45,9 @@ public class Order implements Serializable {
     private String signedHash;
     private String publicKeyId;
     private String signatureStatus; // "VALID", "INVALID", "REVOKED_KEY" (các trạng thái xác thực của chữ ký)
+    private boolean resignRequired;
+    private String resignMessage;
+
 
     @Exclude
     public int getTotalItems() {

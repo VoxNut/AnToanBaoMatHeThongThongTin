@@ -43,53 +43,10 @@ public class AdminOrderServlet extends HttpServlet {
 
             // xác thực động cho từng đơn hàng
             for (Order order : orders) {
-                if (order.getSignature() == null) {
-                    order.setSignatureStatus("UNSIGNED");
-                    continue;
-                }
-
-                try {
-                    User buyer = userDAO.findByUid(order.getUserId());
-                    if (buyer == null) {
-                        order.setSignatureStatus("NO_USER");
-                        continue;
-                    }
-
-                    // tìm khóa trong lịch sử đã dùng để ký đơn hàng này
-                    User.PublicKeyRecord keyRecord = null;
-                    if (buyer.getKeyHistory() != null) {
-                        for (User.PublicKeyRecord rec : buyer.getKeyHistory()) {
-                            if (order.getPublicKeyId() != null && order.getPublicKeyId().equals(rec.getKeyId())) {
-                                keyRecord = rec;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (keyRecord == null) {
-                        order.setSignatureStatus("NO_KEY_FOUND");
-                    } else {
-                        // check xem khóa này có bị hủy trước lúc tạo đơn hàng không nha
-                        if (keyRecord.getRevokedAt() != null && keyRecord.getRevokedAt().before(order.getCreatedAt())) {
-                            order.setSignatureStatus("REVOKED_KEY");
-                        } else {
-                            // tính mã băm hiện tại của đơn hàng để kiểm tra xem có bị sửa đổi gì không
-                            String currentHash = com.beveragestore.util.CryptoUtil.calculateOrderHash(order);
-                            java.security.PublicKey pubKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(keyRecord.getPublicKeyPem());
-                            boolean isValid = com.beveragestore.util.CryptoUtil.verify(currentHash, order.getSignature(), pubKey);
-                            
-                            if (isValid) {
-                                order.setSignatureStatus("VALID");
-                            } else {
-                                order.setSignatureStatus("INVALID"); // đơn hàng đã bị thay đổi trái phép (tampered)!
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("Error verifying signature for order: " + order.getOrderId(), e);
-                    order.setSignatureStatus("ERROR");
-                }
+                User buyer = userDAO.findByUid(order.getUserId());
+                com.beveragestore.util.CryptoUtil.verifyOrderSignature(order, buyer);
             }
+
 
             // 1. Lấy các tham số lọc từ request
             String statusFilter = request.getParameter("statusFilter");
@@ -173,18 +130,48 @@ public class AdminOrderServlet extends HttpServlet {
             if ("update_status".equals(action) && orderId != null) {
                 String newStatus = request.getParameter("status");
                 if (newStatus != null && !newStatus.trim().isEmpty()) {
+                    Order order = orderDAO.getOrderById(orderId);
+                    if (order != null) {
+                        UserDAO userDAO = new UserDAO();
+                        User buyer = userDAO.findByUid(order.getUserId());
+                        com.beveragestore.util.CryptoUtil.verifyOrderSignature(order, buyer);
+
+                        boolean isTargetActive = Order.STATUS_PROCESSING.equals(newStatus) 
+                                || Order.STATUS_SHIPPED.equals(newStatus) 
+                                || Order.STATUS_DELIVERED.equals(newStatus);
+                        
+                        if (isTargetActive && !"VALID".equals(order.getSignatureStatus())) {
+                            response.sendRedirect(request.getContextPath() + "/admin/orders?error=" 
+                                + java.net.URLEncoder.encode("Không thể xử lý/giao đơn hàng có chữ ký lỗi, chưa ký hoặc đã bị báo mất khóa! Bắt buộc phải hủy đơn.", "UTF-8"));
+                            return;
+                        }
+                    }
                     orderDAO.updateOrderStatus(orderId, newStatus);
                     logger.info("Admin updated order {} status to {}", orderId, newStatus);
-                    response.sendRedirect(request.getContextPath() + "/admin/orders?success=Order status updated successfully");
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?success=" 
+                        + java.net.URLEncoder.encode("Cập nhật trạng thái đơn hàng thành công", "UTF-8"));
+                    return;
+                }
+            } else if ("request_resign".equals(action) && orderId != null) {
+                Order order = orderDAO.getOrderById(orderId);
+                if (order != null) {
+                    order.setResignRequired(true);
+                    order.setResignMessage("Cảnh báo: Phát hiện chữ ký không hợp lệ (Dữ liệu đơn hàng có dấu hiệu bị sửa đổi trái phép). Vui lòng tạo cặp khóa mới, báo mất khóa cũ và thực hiện ký lại để tiếp tục xử lý.");
+                    orderDAO.updateOrder(order);
+                    logger.info("Admin requested resign for order {}", orderId);
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?success=" 
+                        + java.net.URLEncoder.encode("Đã gửi thông báo yêu cầu khách hàng ký lại đơn hàng thành công", "UTF-8"));
                     return;
                 }
             }
 
-            response.sendRedirect(request.getContextPath() + "/admin/orders?error=Invalid action");
+            response.sendRedirect(request.getContextPath() + "/admin/orders?error=" 
+                + java.net.URLEncoder.encode("Thao tác không hợp lệ", "UTF-8"));
 
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (Exception e) {
             logger.error("Error updating order", e);
-            response.sendRedirect(request.getContextPath() + "/admin/orders?error=Failed to update order");
+            response.sendRedirect(request.getContextPath() + "/admin/orders?error=" 
+                + java.net.URLEncoder.encode("Cập nhật đơn hàng thất bại", "UTF-8"));
         }
     }
 }
