@@ -134,7 +134,7 @@ public class UserDAO {
     public User findByEmailAndPassword(String email, String plainPassword) throws ExecutionException, InterruptedException {
         User user = findByEmail(email);
 
-        if (user != null && BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
+        if (user != null && user.getPasswordHash() != null && !user.getPasswordHash().trim().isEmpty() && BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
             return user;
         }
 
