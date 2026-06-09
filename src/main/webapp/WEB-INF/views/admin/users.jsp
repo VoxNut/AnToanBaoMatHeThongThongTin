@@ -68,7 +68,7 @@
                          <td><%= u.getEmail() %></td>
                          <td>
                              <span class="role-badge role-<%= u.getRole() %>">
-                                 <fmt:message key="admin.users.role.${u.role}" />
+                                 <fmt:message key="<%= \"admin.users.role.\" + u.getRole() %>" />
                              </span>
                          </td>
                          <td>
