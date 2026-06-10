@@ -205,31 +205,62 @@
                     </button>
                 </form>
             </div>
+
+            <!-- Card: Register new custom Public Key (when user already has an active key) -->
+            <div class="card" style="margin-top: 2rem; border: 1px solid var(--border-color); padding: 25px; border-radius: 8px;">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px; font-weight: 600;"><fmt:message key="key.register_title" /></h3>
+                <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; margin-bottom: 15px;"><fmt:message key="key.register_desc" /></p>
+                <form action="${pageContext.request.contextPath}/customer/keys" method="post">
+                    <input type="hidden" name="action" value="register_public_key">
+                    <div style="margin-bottom: 15px;">
+                        <textarea name="publicKey" required class="form-control" style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%; box-sizing: border-box; padding: 12px;" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-secondary" onclick="return confirm('Đăng ký khóa công khai mới sẽ vô hiệu hóa khóa công khai hiện tại của bạn. Bạn có muốn tiếp tục?');"><fmt:message key="key.btn_register" /></button>
+                </form>
+            </div>
         <%
             } else {
         %>
-            <div class="empty-state" style="text-align: center; padding: 2rem 0;">
-                <h2><fmt:message key="key.empty_title" /></h2>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    <fmt:message key="key.empty_desc" />
-                </p>
-                <form action="${pageContext.request.contextPath}/customer/keys" method="post" onsubmit="return validateKeyForm(this);">
-                    <input type="hidden" name="action" value="generate">
-                    <div style="margin: 15px auto 20px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left; max-width: 400px;">
-                        <p style="font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-primary); text-align: center;"><fmt:message key="key.receive_options_new" /></p>
-                        <div style="display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin: 0 auto;">
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
-                                <input type="checkbox" name="receiveMethod" value="download" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                <fmt:message key="key.option_download" />
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: var(--text-primary);">
-                                <input type="checkbox" name="receiveMethod" value="email" checked style="width: 16px; height: 16px; accent-color: var(--accent-primary);">
-                                <fmt:message key="key.option_email"><fmt:param value="<%= userKeys != null ? userKeys.getEmail() : \"\" %>" /></fmt:message>
-                            </label>
-                        </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 1.5rem;">
+                <!-- Card 1: Online Generation -->
+                <div class="card" style="padding: 25px; border: 1px solid var(--border-color); border-radius: var(--border-radius); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px; font-weight: 600;"><fmt:message key="key.empty_title" /></h3>
+                        <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; margin-bottom: 20px;"><fmt:message key="key.empty_desc" /></p>
                     </div>
-                    <button type="submit" class="btn btn-primary"><fmt:message key="key.btn_generate" /></button>
-                </form>
+                    <form action="${pageContext.request.contextPath}/customer/keys" method="post" onsubmit="return validateKeyForm(this);">
+                        <input type="hidden" name="action" value="generate">
+                        <div style="margin-bottom: 15px; padding: 12px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); text-align: left;">
+                            <p style="font-weight: 600; margin-bottom: 8px; font-size: 13px; color: var(--text-primary); text-align: center;"><fmt:message key="key.receive_options_new" /></p>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-primary);">
+                                    <input type="checkbox" name="receiveMethod" value="download" checked style="width: 15px; height: 15px; accent-color: var(--accent-primary);">
+                                    <fmt:message key="key.option_download" />
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-primary);">
+                                    <input type="checkbox" name="receiveMethod" value="email" checked style="width: 15px; height: 15px; accent-color: var(--accent-primary);">
+                                    <fmt:message key="key.option_email"><fmt:param value="<%= userKeys != null ? userKeys.getEmail() : \"\" %>" /></fmt:message>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;"><fmt:message key="key.btn_generate" /></button>
+                    </form>
+                </div>
+
+                <!-- Card 2: Custom Public Key Registration -->
+                <div class="card" style="padding: 25px; border: 1px solid var(--border-color); border-radius: var(--border-radius); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px; font-weight: 600;"><fmt:message key="key.register_title" /></h3>
+                        <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; margin-bottom: 20px;"><fmt:message key="key.register_desc" /></p>
+                    </div>
+                    <form action="${pageContext.request.contextPath}/customer/keys" method="post">
+                        <input type="hidden" name="action" value="register_public_key">
+                        <div style="margin-bottom: 15px;">
+                            <textarea name="publicKey" required class="form-control" style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%; box-sizing: border-box; padding: 12px;" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;"><fmt:message key="key.btn_register" /></button>
+                    </form>
+                </div>
             </div>
         <%
             }

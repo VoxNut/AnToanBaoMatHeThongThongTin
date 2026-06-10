@@ -79,6 +79,8 @@ public class KeyManagementServlet extends HttpServlet {
                 handleGenerateKeys(request, response, user);
             } else if ("revoke".equals(action)) {
                 handleRevokeKeys(request, response, user);
+            } else if ("register_public_key".equals(action)) {
+                handleRegisterPublicKey(request, response, user);
             } else {
                 response.sendRedirect(request.getContextPath() + "/customer/keys");
             }
@@ -248,5 +250,55 @@ public class KeyManagementServlet extends HttpServlet {
         try (PrintWriter writer = response.getWriter()) {
             writer.write(privKeyPem);
         }
+    }
+
+    private void handleRegisterPublicKey(HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
+        String pubKeyPem = request.getParameter("publicKey");
+        if (pubKeyPem == null || pubKeyPem.trim().isEmpty()) {
+            throw new IllegalArgumentException("Khóa công khai không được để trống.");
+        }
+
+        // Validate public key PEM
+        try {
+            CryptoUtil.pemToPublicKey(pubKeyPem);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Khóa công khai không hợp lệ. Vui lòng kiểm tra lại định dạng PEM.");
+        }
+
+        // Revoke active key if exists
+        String activeKeyId = user.getActivePublicKeyId();
+        List<User.PublicKeyRecord> history = user.getKeyHistory();
+        if (history == null) {
+            history = new ArrayList<>();
+        }
+        if (activeKeyId != null) {
+            for (User.PublicKeyRecord record : history) {
+                if (activeKeyId.equals(record.getKeyId())) {
+                    if (record.getRevokedAt() == null) {
+                        record.setRevokedAt(new Date());
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Register new public key
+        String newKeyId = UUID.randomUUID().toString();
+        user.setActivePublicKey(pubKeyPem.trim());
+        user.setActivePublicKeyId(newKeyId);
+        user.setKeyRevokedAt(null);
+
+        history.add(User.PublicKeyRecord.builder()
+                .keyId(newKeyId)
+                .publicKeyPem(pubKeyPem.trim())
+                .createdAt(new Date())
+                .build());
+        user.setKeyHistory(history);
+
+        userDAO.updateUser(user);
+        logger.info("Registered offline public key for user: {}, KeyID: {}", user.getEmail(), newKeyId);
+
+        request.getSession().setAttribute("success", "Đăng ký khóa công khai thành công!");
+        response.sendRedirect(request.getContextPath() + "/customer/keys");
     }
 }
