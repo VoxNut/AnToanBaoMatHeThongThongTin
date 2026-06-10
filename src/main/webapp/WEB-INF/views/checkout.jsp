@@ -203,7 +203,7 @@ function setSignMethod(method) {
 
 function updateRawOrderString() {
     var orderId = "${orderId}";
-    var userId = "${sessionScope.userId}";
+    var userId = "${sessionScope.loggedInUser.uid}";
     var totalAmount = parseFloat("${cartTotal}").toFixed(2);
     var address = document.getElementById("shippingAddress").value.trim();
     
