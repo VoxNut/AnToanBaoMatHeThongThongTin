@@ -168,6 +168,41 @@ public class OrderDetailServlet extends HttpServlet {
             return;
         }
 
+        if ("cancel_and_reorder".equals(action)) {
+            try {
+                Order order = orderDAO.getOrderById(orderId);
+                if (order == null || !order.getUserId().equals(userId)) {
+                    response.sendRedirect(request.getContextPath() + "/customer/orders");
+                    return;
+                }
+
+                // 1. Thực hiện hủy đơn hàng (hoàn lại số lượng sản phẩm vào kho)
+                cancelOrderTransaction(userId, orderId);
+
+                // 2. Đưa các món trong đơn hàng bị hủy vào giỏ hàng
+                com.beveragestore.dao.CartDAO cartDAO = new com.beveragestore.dao.CartDAO();
+                if (order.getItems() != null) {
+                    for (Order.OrderItem item : order.getItems()) {
+                        com.beveragestore.model.CartItem cartItem = com.beveragestore.model.CartItem.builder()
+                                .productId(item.getProductId())
+                                .quantity(item.getQuantity())
+                                .addedAt(System.currentTimeMillis())
+                                .build();
+                        cartDAO.addOrUpdateCartItem(userId, cartItem);
+                    }
+                }
+
+                request.getSession().setAttribute("success", "Đã hủy đơn hàng bị sửa đổi thành công và đưa các sản phẩm vào giỏ hàng. Vui lòng kiểm tra và sửa lại số lượng chính xác trước khi đặt hàng mới.");
+                response.sendRedirect(request.getContextPath() + "/customer/cart");
+                return;
+            } catch (Exception e) {
+                logger.error("Lỗi khi hủy và đặt lại đơn hàng", e);
+                request.getSession().setAttribute("error", "Không thể hủy và đặt lại đơn hàng: " + e.getMessage());
+                response.sendRedirect(request.getContextPath() + "/customer/order-detail?id=" + orderId);
+                return;
+            }
+        }
+
         if (!"cancel".equals(action)) {
             response.sendRedirect(request.getContextPath() + "/customer/orders");
             return;
