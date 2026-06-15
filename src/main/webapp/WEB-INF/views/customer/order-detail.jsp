@@ -280,7 +280,6 @@
                     });
                 }
                 </script>
-            <% } %>
 
             <!-- tiến trình trạng thái đơn hàng -->
             <div class="detail-section">
