@@ -93,7 +93,7 @@
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 16px; font-weight: 600;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 <% if (isTampered) { %>
-                    ⚠️ CẢNH BÁO: PHÁT HIỆN CAN THIỆP DỮ LIỆU ĐƠN HÀNG
+                    CẢNH BÁO: PHÁT HIỆN CAN THIỆP DỮ LIỆU ĐƠN HÀNG
                 <% } else { %>
                     <fmt:message key="checkout.resign_title" />
                 <% } %>
@@ -137,7 +137,7 @@
                         <input type="hidden" name="action" value="cancel_and_reorder" />
                         <input type="hidden" name="id" value="<%= order.getOrderId() %>" />
                         <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545; width: 100%; font-size: 15px; font-weight: 600; padding: 12px 20px;">
-                            🔄 Hủy & Đặt lại đơn hàng
+                            Hủy & Đặt lại đơn hàng
                         </button>
                     </form>
                 </div>

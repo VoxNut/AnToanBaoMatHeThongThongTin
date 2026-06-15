@@ -248,20 +248,26 @@ public class OrderDetailServlet extends HttpServlet {
                 throw new IllegalArgumentException("Chỉ đơn hàng ở trạng thái chờ duyệt (PENDING) mới có thể hủy.");
             }
 
-            // Hoàn lại số lượng sản phẩm vào kho
+            // 1. Thực hiện toàn bộ lượt ĐỌC (Reads) trước
+            java.util.Map<String, Integer> productNewStockMap = new java.util.HashMap<>();
             if (order.getItems() != null) {
                 for (Order.OrderItem item : order.getItems()) {
                     DocumentSnapshot productSnapshot = transaction.get(db.collection("products").document(item.getProductId())).get();
                     Product product = productSnapshot.toObject(Product.class);
                     if (product != null) {
                         int newStock = product.getStock() + item.getQuantity();
-                        transaction.update(
-                                db.collection("products").document(item.getProductId()),
-                                "stock", newStock,
-                                "updatedAt", new Date()
-                        );
+                        productNewStockMap.put(item.getProductId(), newStock);
                     }
                 }
+            }
+
+            // 2. Thực hiện toàn bộ lượt GHI (Writes) sau
+            for (java.util.Map.Entry<String, Integer> entry : productNewStockMap.entrySet()) {
+                transaction.update(
+                        db.collection("products").document(entry.getKey()),
+                        "stock", entry.getValue(),
+                        "updatedAt", new Date()
+                );
             }
 
             // Cập nhật trạng thái đơn hàng thành CANCELLED
