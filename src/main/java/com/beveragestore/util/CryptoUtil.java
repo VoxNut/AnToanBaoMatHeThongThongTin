@@ -77,8 +77,8 @@ public class CryptoUtil {
         byte[] hashBytes = digest.digest(data.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hashBytes);
     }
-    // tính mã băm (hash) đặc trưng cho dữ liệu đơn hàng
-    public static String calculateOrderHash(Order order) throws NoSuchAlgorithmException {
+    // dựng chuỗi dữ liệu thô đặc trưng của đơn hàng
+    public static String buildRawOrderString(Order order) {
         StringBuilder sb = new StringBuilder();
         sb.append(order.getOrderId()).append("|");
         sb.append(order.getUserId()).append("|");
@@ -92,7 +92,12 @@ public class CryptoUtil {
                   .append(String.format(java.util.Locale.US, "%.2f", item.getUnitPrice())).append("|");
             }
         }
-        return sha256(sb.toString());
+        return sb.toString();
+    }
+
+    // tính mã băm (hash) đặc trưng cho dữ liệu đơn hàng (Double Hash cho Raw Order / Order Hash)
+    public static String calculateOrderHash(Order order) throws NoSuchAlgorithmException {
+        return sha256(buildRawOrderString(order));
     }
 
     // ký lên mã băm bằng privatekey
@@ -104,7 +109,7 @@ public class CryptoUtil {
         return Base64.getEncoder().encodeToString(signatureBytes);
     }
 
-    // xác thực chữ ký số bằng publickey
+    // xác thực chữ ký số bằng publickey (cho Double Hash)
     public static boolean verify(String hash, String signature, PublicKey publicKey) {
         try {
             Signature sig = Signature.getInstance("SHA256withRSA");
@@ -117,8 +122,20 @@ public class CryptoUtil {
         }
     }
 
-    // xác thực động trạng thái chữ ký số của đơn hàng từ lịch sử khóa của user
+    // xác thực chữ ký số dạng văn bản thường (cho Single Hash - Plain Text)
+    public static boolean verifyPlain(String rawData, String signature, PublicKey publicKey) {
+        try {
+            Signature sig = Signature.getInstance("SHA256withRSA");
+            sig.initVerify(publicKey);
+            sig.update(rawData.getBytes(StandardCharsets.UTF_8));
+            byte[] sigBytes = Base64.getDecoder().decode(signature);
+            return sig.verify(sigBytes);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
+    // xác thực động trạng thái chữ ký số của đơn hàng từ lịch sử khóa của user
     public static void verifyOrderSignature(Order order, User buyer) {
         if (order.getSignature() == null) {
             order.setSignatureStatus("UNSIGNED");
@@ -147,9 +164,18 @@ public class CryptoUtil {
                     order.setSignatureStatus("REVOKED_KEY");
                 } else {
                     // kiểm tra xem dữ liệu đơn hàng có bị sửa đổi không
-                    String currentHash = calculateOrderHash(order);
                     PublicKey pubKey = pemToPublicKey(keyRecord.getPublicKeyPem());
+                    
+                    // Cách 1: Double Hash (Mặc định cho Raw Order và Order Hash)
+                    String currentHash = calculateOrderHash(order);
                     boolean isValid = verify(currentHash, order.getSignature(), pubKey);
+                    
+                    // Cách 2: Single Hash (Cho Plain Text)
+                    if (!isValid) {
+                        String rawOrderData = buildRawOrderString(order);
+                        isValid = verifyPlain(rawOrderData, order.getSignature(), pubKey);
+                    }
+                    
                     if (isValid) {
                         order.setSignatureStatus("VALID");
                     } else {

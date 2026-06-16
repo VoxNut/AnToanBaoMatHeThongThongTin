@@ -224,9 +224,15 @@ public class CheckoutServlet extends HttpServlet {
                     // xác thực dựa trên public key đang kích hoạt
                     java.security.PublicKey publicKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(dbUser.getActivePublicKey());
                     boolean isValid = com.beveragestore.util.CryptoUtil.verify(hash, signature, publicKey);
-                    if (!isValid) {
+                    String rawOrderData = com.beveragestore.util.CryptoUtil.buildRawOrderString(order);
+                    boolean isValidPlain = com.beveragestore.util.CryptoUtil.verifyPlain(rawOrderData, signature, publicKey);
+                    
+                    if (!isValid && !isValidPlain) {
                         throw new IllegalArgumentException("Khóa hoặc chữ ký không khớp với khóa công khai đã đăng ký trên hệ thống.");
                     }
+                    
+                    // Nếu pass một trong hai
+                    isValid = true;
 
                     order.setSignature(signature);
                     order.setSignedHash(hash);

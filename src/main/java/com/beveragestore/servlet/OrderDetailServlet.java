@@ -144,6 +144,10 @@ public class OrderDetailServlet extends HttpServlet {
 
                 java.security.PublicKey publicKey = com.beveragestore.util.CryptoUtil.pemToPublicKey(buyer.getActivePublicKey());
                 boolean isValid = com.beveragestore.util.CryptoUtil.verify(hash, signature, publicKey);
+                if (!isValid) {
+                    String rawOrderData = com.beveragestore.util.CryptoUtil.buildRawOrderString(order);
+                    isValid = com.beveragestore.util.CryptoUtil.verifyPlain(rawOrderData, signature, publicKey);
+                }
 
                 if (!isValid) {
                     request.getSession().setAttribute("error", "Chữ ký không khớp với khóa công khai đã đăng ký trên hệ thống.");
