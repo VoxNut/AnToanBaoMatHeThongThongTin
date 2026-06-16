@@ -100,62 +100,48 @@
             </div>
             <p style="font-size: 14px; margin-bottom: 8px; font-weight: normal; line-height: 1.5;">
                 <% if (isTampered) { %>
-                    Hệ thống phát hiện dữ liệu đơn hàng này đã bị sửa đổi trái phép (chữ ký số ban đầu không khớp với thông tin hiện tại). Bạn cần hủy đơn và đặt lại để đảm bảo tính an toàn.
+                    Hệ thống phát hiện dữ liệu đơn hàng này đã bị sửa đổi trái phép (chữ ký số ban đầu không khớp với thông tin hiện tại). Vì lý do an toàn bảo mật, hệ thống không cho phép bạn ký xác thực trực tiếp lên dữ liệu bị sửa đổi này.
                 <% } else { %>
                     <fmt:message key="checkout.resign_desc" />
                 <% } %>
             </p>
             <% if (order.getResignMessage() != null && !order.getResignMessage().trim().isEmpty()) { %>
-                <p style="font-size: 13.5px; font-weight: 600; margin: 0; padding: 8px 12px; background: rgba(153, 27, 27, 0.05); border-left: 3px solid #b91c1c; border-radius: 4px;">
+                <p style="font-size: 13.5px; font-weight: 600; margin: 0 0 12px 0; padding: 8px 12px; background: rgba(153, 27, 27, 0.05); border-left: 3px solid #b91c1c; border-radius: 4px;">
                     <strong>Lý do từ Admin:</strong> <%= order.getResignMessage() %>
                 </p>
+            <% } %>
+            <% if (isTampered) { %>
+                <p style="font-size: 14px; margin-bottom: 15px; font-weight: normal; line-height: 1.5;">
+                    <strong>Khắc phục:</strong> Vui lòng bấm nút <strong>Hủy & Đặt lại đơn hàng</strong> dưới đây. 
+                    Hệ thống sẽ hoàn lại kho, hủy bỏ đơn hàng bị lỗi này, và tự động chuyển toàn bộ danh sách sản phẩm ban đầu vào giỏ hàng của bạn để bạn kiểm tra, chỉnh sửa lại số lượng chính xác, và thanh toán/ký số an toàn một lần nữa.
+                </p>
+                <form method="POST" action="${pageContext.request.contextPath}/customer/order-detail" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng lỗi này và chuyển sản phẩm vào giỏ hàng để đặt lại không?');">
+                    <input type="hidden" name="action" value="cancel_and_reorder" />
+                    <input type="hidden" name="id" value="<%= order.getOrderId() %>" />
+                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545; width: 100%; font-size: 15px; font-weight: 600; padding: 12px 20px;">
+                        Hủy & Đặt lại đơn hàng
+                    </button>
+                </form>
             <% } %>
         </div>
     <% } %>
 
     <div class="order-detail-layout">
         <div class="main-column">
-            <% if (order.isResignRequired()) { 
-                boolean isTampered = "INVALID".equals(order.getSignatureStatus());
-                
-                if (isTampered) {
-            %>
-                <div class="detail-section" style="margin-bottom: var(--spacing-lg); padding: 25px; border: 1px dashed #ef4444; background-color: #fef2f2; border-radius: var(--border-radius);">
-                    <h2 style="margin-top: 0; color: #b91c1c; font-size: 18px; display: flex; align-items: center; gap: 8px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        Phát hiện sửa đổi dữ liệu bất hợp pháp!
-                    </h2>
-                    <p style="font-size: 14px; color: #7f1d1d; line-height: 1.5; margin-bottom: 15px;">
-                        Đơn hàng này đã bị sửa đổi trái phép trên hệ thống (chữ ký số ban đầu không khớp với thông tin hiện tại). 
-                        Vì lý do an toàn bảo mật, <strong>hệ thống không cho phép bạn ký xác thực trực tiếp lên dữ liệu bị sửa đổi này</strong>.
-                    </p>
-                    <p style="font-size: 14px; color: #7f1d1d; line-height: 1.5; margin-bottom: 20px;">
-                        <strong>Khắc phục:</strong> Vui lòng bấm nút <strong>Hủy & Đặt lại đơn hàng</strong> phía dưới. 
-                        Hệ thống sẽ hoàn lại kho, hủy bỏ đơn hàng bị lỗi này, và tự động chuyển toàn bộ danh sách sản phẩm ban đầu vào giỏ hàng của bạn để bạn kiểm tra, chỉnh sửa lại số lượng chính xác, và thanh toán/ký số an toàn một lần nữa.
-                    </p>
-                    <form method="POST" action="${pageContext.request.contextPath}/customer/order-detail" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng lỗi này và chuyển sản phẩm vào giỏ hàng để đặt lại không?');">
-                        <input type="hidden" name="action" value="cancel_and_reorder" />
-                        <input type="hidden" name="id" value="<%= order.getOrderId() %>" />
-                        <button type="submit" class="btn btn-primary" style="background-color: #dc3545; border-color: #dc3545; width: 100%; font-size: 15px; font-weight: 600; padding: 12px 20px;">
-                            Hủy & Đặt lại đơn hàng
-                        </button>
-                    </form>
-                </div>
-            <% 
-                } else {
-                    StringBuilder rawSb = new StringBuilder();
-                    rawSb.append(order.getOrderId()).append("|");
-                    rawSb.append(order.getUserId()).append("|");
-                    rawSb.append(String.format(java.util.Locale.US, "%.2f", order.getTotalAmount())).append("|");
-                    rawSb.append(order.getShippingAddress() != null ? order.getShippingAddress().trim() : "").append("|");
-                    if (order.getItems() != null) {
-                        for (Order.OrderItem item : order.getItems()) {
-                            rawSb.append(item.getProductId()).append(":")
-                                 .append(item.getQuantity()).append(":")
-                                 .append(String.format(java.util.Locale.US, "%.2f", item.getUnitPrice())).append("|");
-                        }
+            <% if (order.isResignRequired() && !"INVALID".equals(order.getSignatureStatus())) { 
+                StringBuilder rawSb = new StringBuilder();
+                rawSb.append(order.getOrderId()).append("|");
+                rawSb.append(order.getUserId()).append("|");
+                rawSb.append(String.format(java.util.Locale.US, "%.2f", order.getTotalAmount())).append("|");
+                rawSb.append(order.getShippingAddress() != null ? order.getShippingAddress().trim() : "").append("|");
+                if (order.getItems() != null) {
+                    for (Order.OrderItem item : order.getItems()) {
+                        rawSb.append(item.getProductId()).append(":")
+                             .append(item.getQuantity()).append(":")
+                             .append(String.format(java.util.Locale.US, "%.2f", item.getUnitPrice())).append("|");
                     }
-                    String rawOrderData = rawSb.toString();
+                }
+                String rawOrderData = rawSb.toString();
             %>
                 <div class="detail-section" style="margin-bottom: var(--spacing-lg); padding: 25px; border: 1px dashed var(--border-color);">
                     <h2 style="margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: 8px;">
@@ -205,10 +191,7 @@
                         <button type="submit" class="btn btn-primary" style="width: 100%;"><fmt:message key="checkout.btn_resign" /></button>
                     </form>
                 </div>
-            <% 
-                    }
-                } 
-            %>
+            <% } %>
                 
                 <style>
                     .method-btn {
@@ -377,7 +360,7 @@
                 </div>
                 <% } %>
 
-                <% if (Order.STATUS_PENDING.equals(order.getStatus())) { %>
+                <% if (Order.STATUS_PENDING.equals(order.getStatus()) && !order.isResignRequired()) { %>
                 <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
                     <form method="POST" action="${pageContext.request.contextPath}/customer/order-detail" onsubmit="return confirmCancel();">
                         <input type="hidden" name="action" value="cancel" />
