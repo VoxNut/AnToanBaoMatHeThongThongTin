@@ -85,7 +85,7 @@
                             <fmt:message key="checkout.sign_instructions" />
                         </p>
                         <div style="margin-bottom: 10px;">
-                            <input type="file" id="privateKeyFile" accept=".pem" class="form-control" style="font-size: 13px; padding: 5px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            <input type="file" id="privateKeyFile" accept=".pem,.txt,.key" class="form-control" onchange="handlePrivateKeySelect(event)" style="font-size: 13px; padding: 5px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary);">
                         </div>
                         <textarea id="privateKey" name="privateKey" class="form-control" required style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary);" placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"></textarea>
                     </div>
@@ -158,7 +158,7 @@
 <jsp:include page="/WEB-INF/views/partials/footer.jsp" />
 
 <script>
-document.getElementById('privateKeyFile').addEventListener('change', function(e) {
+function handlePrivateKeySelect(e) {
     var file = e.target.files[0];
     if (file) {
         var reader = new FileReader();
@@ -167,7 +167,7 @@ document.getElementById('privateKeyFile').addEventListener('change', function(e)
         };
         reader.readAsText(file);
     }
-});
+}
 
 function setSignMethod(method) {
     document.getElementById('signMethod').value = method;
@@ -227,7 +227,7 @@ function copyRawOrder() {
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value).then(function() {
-        alert("Đã copy chuỗi dữ liệu gốc để ký!");
+        showAlert("Đã copy chuỗi dữ liệu gốc để ký!", "success");
     });
 }
 </script>

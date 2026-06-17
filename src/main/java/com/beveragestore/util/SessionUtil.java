@@ -22,6 +22,9 @@ public class SessionUtil {
      * lấy thông tin user đã đăng nhập từ session
      */
     public static User getUserFromSession(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
         return (User) session.getAttribute(SESSION_KEY_USER);
     }
 

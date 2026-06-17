@@ -259,7 +259,7 @@
                     copyText.select();
                     copyText.setSelectionRange(0, 99999);
                     navigator.clipboard.writeText(copyText.value).then(function() {
-                        alert("Đã copy chuỗi dữ liệu gốc để ký!");
+                        showAlert("Đã copy chuỗi dữ liệu gốc để ký!", "success");
                     });
                 }
                 </script>

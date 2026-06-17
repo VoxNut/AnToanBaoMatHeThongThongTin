@@ -2,9 +2,19 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="com.beveragestore.util.SessionUtil" %>
 <%@ page import="com.beveragestore.model.User" %>
+<%@ page import="com.beveragestore.dao.CartDAO" %>
 
 <%
     User currentUser = SessionUtil.getUserFromSession(request.getSession(false));
+    int cartCount = 0;
+    if (currentUser != null) {
+        try {
+            CartDAO cartDAO = new CartDAO();
+            cartCount = cartDAO.getCartItemCount(currentUser.getUid());
+        } catch (Exception e) {
+            // ignore
+        }
+    }
 %>
 
 <header class="site-header">
@@ -29,8 +39,11 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </a>
             
-            <a href="${pageContext.request.contextPath}/customer/cart" title="<fmt:message key="nav.cart" />">
+            <a href="${pageContext.request.contextPath}/customer/cart" class="cart-icon-container" title="<fmt:message key="nav.cart" />">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <% if (cartCount > 0) { %>
+                    <span class="cart-badge"><%= cartCount %></span>
+                <% } %>
             </a>
 
             <% if (currentUser != null) { %>

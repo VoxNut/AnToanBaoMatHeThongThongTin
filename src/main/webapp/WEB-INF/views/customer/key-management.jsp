@@ -81,7 +81,7 @@
             var checkboxes = form.querySelectorAll('input[name="receiveMethod"]');
             var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
             if (!checkedOne) {
-                alert('<fmt:message key="key.validation.select_method" />');
+                showAlert('<fmt:message key="key.validation.select_method" />', 'error');
                 return false;
             }
 
@@ -91,7 +91,7 @@
                 var selectedDate = new Date(revokeTimeInput.value);
                 var now = new Date();
                 if (selectedDate > now) {
-                    alert('<fmt:message key="key.validation.future_date" />');
+                    showAlert('<fmt:message key="key.validation.future_date" />', 'error');
                     return false;
                 }
             }
@@ -213,7 +213,10 @@
                 <form action="${pageContext.request.contextPath}/customer/keys" method="post">
                     <input type="hidden" name="action" value="register_public_key">
                     <div style="margin-bottom: 15px;">
-                        <textarea name="publicKey" required class="form-control" style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%; box-sizing: border-box; padding: 12px;" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
+                        <div style="margin-bottom: 10px;">
+                            <input type="file" id="publicKeyFileActive" accept=".pem,.pub,.txt" class="form-control" onchange="handleFileSelect(event, 'publicKeyInputActive')" style="font-size: 13px; padding: 5px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary);">
+                        </div>
+                        <textarea id="publicKeyInputActive" name="publicKey" required class="form-control" style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%; box-sizing: border-box; padding: 12px;" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
                     </div>
                     <button type="submit" class="btn btn-secondary" onclick="return confirm('Đăng ký khóa công khai mới sẽ vô hiệu hóa khóa công khai hiện tại của bạn. Bạn có muốn tiếp tục?');"><fmt:message key="key.btn_register" /></button>
                 </form>
@@ -256,7 +259,10 @@
                     <form action="${pageContext.request.contextPath}/customer/keys" method="post">
                         <input type="hidden" name="action" value="register_public_key">
                         <div style="margin-bottom: 15px;">
-                            <textarea name="publicKey" required class="form-control" style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%; box-sizing: border-box; padding: 12px;" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
+                            <div style="margin-bottom: 10px;">
+                                <input type="file" id="publicKeyFileEmpty" accept=".pem,.pub,.txt" class="form-control" onchange="handleFileSelect(event, 'publicKeyInputEmpty')" style="font-size: 13px; padding: 5px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            </div>
+                            <textarea id="publicKeyInputEmpty" name="publicKey" required class="form-control" style="font-family: monospace; font-size: 12px; height: 120px; background: var(--bg-white); border: 1px solid var(--border-color); color: var(--text-primary); width: 100%; box-sizing: border-box; padding: 12px;" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
                         </div>
                         <button type="submit" class="btn btn-secondary" style="width: 100%;"><fmt:message key="key.btn_register" /></button>
                     </form>
@@ -305,6 +311,19 @@
 </div>
 
 <jsp:include page="/WEB-INF/views/partials/footer.jsp" />
+
+<script>
+function handleFileSelect(event, textareaId) {
+    var file = event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(evt) {
+            document.getElementById(textareaId).value = evt.target.result;
+        };
+        reader.readAsText(file);
+    }
+}
+</script>
 
 </body>
 </html>

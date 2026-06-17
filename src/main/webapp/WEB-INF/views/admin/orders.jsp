@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.beveragestore.model.Order" %>
+<%@ page import="com.google.gson.Gson" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -258,6 +259,7 @@
                 </thead>
                 <tbody>
                     <% List<Order> orders = (List<Order>) request.getAttribute("orders");
+                       com.google.gson.Gson gson = new com.google.gson.Gson();
                        if (orders != null && !orders.isEmpty()) {
                            for (Order o : orders) {
                                String sigStatus = o.getSignatureStatus() != null ? o.getSignatureStatus() : "UNSIGNED";
@@ -282,13 +284,26 @@
                                    badgeColor = "var(--error-text)";
                                    badgeIcon = "<svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' style='margin-right: 4px; vertical-align: text-bottom;'><circle cx='12' cy='12' r='10'></circle><line x1='4.93' y1='4.93' x2='19.07' y2='19.07'></line></svg>";
                                }
+                               
+                               String escapedItemsJson = gson.toJson(o.getItems()).replace("\"", "&quot;").replace("'", "&#39;");
                      %>
                      <tr>
                          <td>
                              <div style="display: flex; align-items: center; gap: 4px;">
-                                 <span style="font-family: monospace; color: var(--text-secondary);" title="<%= o.getOrderId() %>">
+                                 <a href="javascript:void(0);" class="view-details-btn" onclick="openOrderDetailModal(this)"
+                                    style="font-family: monospace; color: var(--accent-primary); font-weight: 600; text-decoration: none;"
+                                    data-order-id="<%= o.getOrderId() %>"
+                                    data-created-at="<%= new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm:ss").format(o.getCreatedAt()) %>"
+                                    data-total-amount="<%= String.format("%,.0f VNĐ", o.getTotalAmount()) %>"
+                                    data-shipping-address="<%= o.getShippingAddress() != null ? o.getShippingAddress().replace("\"", "&quot;") : "" %>"
+                                    data-notes="<%= o.getNotes() != null ? o.getNotes().replace("\"", "&quot;") : "" %>"
+                                    data-sig-status="<%= sigStatus %>"
+                                    data-key-id="<%= o.getPublicKeyId() != null ? o.getPublicKeyId() : "" %>"
+                                    data-signature="<%= o.getSignature() != null ? o.getSignature() : "" %>"
+                                    data-items="<%= escapedItemsJson %>"
+                                    title="Xem chi tiết đơn hàng">
                                      <%= o.getOrderId().substring(0, 8) %>...
-                                 </span>
+                                 </a>
                                  <fmt:message key="admin.orders.table.copy_title" var="copyTitle" />
                                  <button onclick="copyToClipboard('<%= o.getOrderId() %>')" style="background: none; border: none; padding: 2px; cursor: pointer; color: var(--text-light); display: inline-flex; align-items: center;" title="${copyTitle}">
                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -357,6 +372,60 @@
 <!-- Toast Popup -->
 <div id="toast-msg" class="toast-container"></div>
 
+<!-- Order Detail Modal -->
+<div id="orderDetailModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 style="font-family: var(--font-heading); margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">Chi tiết Đơn hàng</h2>
+        
+        <div class="order-info-grid">
+            <div class="order-info-item">
+                <strong>Mã đơn hàng</strong>
+                <span id="modalOrderId" style="font-family: monospace; font-size: 13px;"></span>
+            </div>
+            <div class="order-info-item">
+                <strong>Ngày đặt</strong>
+                <span id="modalOrderDate"></span>
+            </div>
+            <div class="order-info-item">
+                <strong>Địa chỉ giao hàng</strong>
+                <span id="modalShippingAddress"></span>
+            </div>
+            <div class="order-info-item">
+                <strong>Ghi chú</strong>
+                <span id="modalNotes"></span>
+            </div>
+        </div>
+
+        <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 10px;">Sản phẩm đã đặt</h3>
+        <table class="modal-items-table">
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th style="text-align: center;">Số lượng</th>
+                    <th style="text-align: right;">Đơn giá</th>
+                    <th style="text-align: right;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody id="modalItemsBody">
+            </tbody>
+        </table>
+        
+        <div style="text-align: right; margin-top: 15px; font-size: 16px; font-weight: 700; color: var(--accent-primary);">
+            Tổng cộng: <span id="modalTotalAmount"></span>
+        </div>
+
+        <div style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+            <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 10px 0; color: var(--text-primary);">Thông tin chữ ký số</h3>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 13px;">
+                <div><strong>Trạng thái:</strong> <span id="modalSigStatus" style="padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600;"></span></div>
+                <div><strong>Public Key ID:</strong> <span id="modalKeyId" style="font-family: monospace;"></span></div>
+                <div><strong>Chữ ký (Base64):</strong> <div id="modalSignature" style="font-family: monospace; word-break: break-all; background: var(--bg-white); padding: 8px; border: 1px solid var(--border-color); max-height: 80px; overflow-y: auto; border-radius: 4px; margin-top: 4px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function showToast(message) {
     var toast = document.getElementById("toast-msg");
@@ -376,6 +445,100 @@ function copyToClipboard(text) {
         console.error('Could not copy text: ', err);
     });
 }
+
+function openOrderDetailModal(element) {
+    var orderId = element.getAttribute("data-order-id");
+    var createdAt = element.getAttribute("data-created-at");
+    var totalAmount = element.getAttribute("data-total-amount");
+    var shippingAddress = element.getAttribute("data-shipping-address");
+    var notes = element.getAttribute("data-notes") || "Không có ghi chú";
+    var sigStatus = element.getAttribute("data-sig-status");
+    var keyId = element.getAttribute("data-key-id") || "Không tìm thấy khóa";
+    var signature = element.getAttribute("data-signature") || "Chưa ký";
+    var itemsJson = element.getAttribute("data-items");
+    
+    document.getElementById("modalOrderId").innerText = orderId;
+    document.getElementById("modalOrderDate").innerText = createdAt;
+    document.getElementById("modalShippingAddress").innerText = shippingAddress;
+    document.getElementById("modalNotes").innerText = notes;
+    document.getElementById("modalTotalAmount").innerText = totalAmount;
+    
+    // Status color mapping
+    var sigStatusText = "Chưa ký";
+    var sigStatusBg = "var(--bg-secondary)";
+    var sigStatusColor = "var(--text-primary)";
+    
+    if (sigStatus === "VALID") {
+        sigStatusText = "Hợp lệ";
+        sigStatusBg = "var(--success-bg)";
+        sigStatusColor = "var(--success-text)";
+    } else if (sigStatus === "INVALID") {
+        sigStatusText = "Bị thay đổi / Không hợp lệ";
+        sigStatusBg = "var(--error-bg)";
+        sigStatusColor = "var(--error-text)";
+    } else if (sigStatus === "REVOKED_KEY") {
+        sigStatusText = "Khóa đã bị thu hồi";
+        sigStatusBg = "#fef3c7";
+        sigStatusColor = "#b45309";
+    }
+    
+    var sigSpan = document.getElementById("modalSigStatus");
+    sigSpan.innerText = sigStatusText;
+    sigSpan.style.backgroundColor = sigStatusBg;
+    sigSpan.style.color = sigStatusColor;
+    sigSpan.style.border = "1px solid " + sigStatusColor + "22";
+    
+    document.getElementById("modalKeyId").innerText = keyId;
+    document.getElementById("modalSignature").innerText = signature;
+    
+    // Render items
+    var itemsBody = document.getElementById("modalItemsBody");
+    itemsBody.innerHTML = "";
+    try {
+        var items = JSON.parse(itemsJson);
+        items.forEach(function(item) {
+            var row = document.createElement("tr");
+            
+            var nameTd = document.createElement("td");
+            nameTd.innerText = item.productName || item.productId;
+            
+            var qtyTd = document.createElement("td");
+            qtyTd.innerText = item.quantity;
+            qtyTd.style.textAlign = "center";
+            
+            var priceTd = document.createElement("td");
+            priceTd.innerText = parseFloat(item.unitPrice).toLocaleString('vi-VN') + " VNĐ";
+            priceTd.style.textAlign = "right";
+            
+            var subTd = document.createElement("td");
+            var subtotal = item.unitPrice * item.quantity;
+            subTd.innerText = subtotal.toLocaleString('vi-VN') + " VNĐ";
+            subTd.style.textAlign = "right";
+            
+            row.appendChild(nameTd);
+            row.appendChild(qtyTd);
+            row.appendChild(priceTd);
+            row.appendChild(subTd);
+            itemsBody.appendChild(row);
+        });
+    } catch(e) {
+        console.error("Error parsing items JSON", e);
+    }
+    
+    document.getElementById("orderDetailModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("orderDetailModal").style.display = "none";
+}
+
+// Close when clicking outside modal content
+window.addEventListener("click", function(event) {
+    var modal = document.getElementById("orderDetailModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+});
 </script>
 
 <jsp:include page="/WEB-INF/views/partials/footer.jsp" />
