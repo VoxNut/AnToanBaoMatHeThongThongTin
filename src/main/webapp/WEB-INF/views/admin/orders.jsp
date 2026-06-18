@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=1.1">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css?v=1.0">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css?v=1.1">
     <style>
         .filter-bar {
             background: #f8f9fa;
@@ -172,6 +172,95 @@
             z-index: 10000;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             border: 1px solid #3f3f46;
+        }
+
+        /* Modal popup styles for Admin Orders details */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--bg-white);
+            margin: 5% auto; 
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 700px; 
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-primary);
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .order-info-item {
+            font-size: 14px;
+        }
+
+        .order-info-item strong {
+            color: var(--text-secondary);
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .modal-items-table {
+            width: 100%;
+            margin-top: 12px;
+            border-collapse: collapse;
+        }
+
+        .modal-items-table th {
+            background: var(--bg-secondary);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-items-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13.5px;
         }
     </style>
 </head>
@@ -480,6 +569,10 @@ function openOrderDetailModal(element) {
         sigStatusText = "Khóa đã bị thu hồi";
         sigStatusBg = "#fef3c7";
         sigStatusColor = "#b45309";
+    } else if (sigStatus === "NO_KEY_FOUND") {
+        sigStatusText = "Không tìm thấy khóa";
+        sigStatusBg = "var(--error-bg)";
+        sigStatusColor = "var(--error-text)";
     }
     
     var sigSpan = document.getElementById("modalSigStatus");
